@@ -13,6 +13,8 @@ public class Property<T> {
         this.init = init;
     }
 
+
+
     public Property(String name, Range range) {
         this.name = name;
         this.range = range;
@@ -28,6 +30,10 @@ public class Property<T> {
 
     public void setRange(Range range) {
         this.range = range;
+    }
+
+    public void setRandom(Boolean random) {
+        isRandom = random;
     }
 
     public String getName() {

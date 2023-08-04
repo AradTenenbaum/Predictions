@@ -1,14 +1,27 @@
 package com.predict.engine.def;
 
+import java.util.List;
+
 public class MultipleCondition extends Condition {
-    private Condition c1;
-    private Condition c2;
+    private List<Condition> conditions;
     private String logical;
 
-    public MultipleCondition(String type, Entity entity, Property property, Action thenAction, Action elseAction, Condition c1, Condition c2, String logical) {
-        super(type, entity, property, thenAction, elseAction);
-        this.c1 = c1;
-        this.c2 = c2;
+    public MultipleCondition(String entity, String property, Action thenAction, Action elseAction, List<Condition> conditions, String logical) {
+        super(entity, property, thenAction, elseAction);
+        this.conditions = conditions;
         this.logical = logical;
+    }
+
+    @Override
+    public String toString() {
+        return "MultipleCondition{" +
+                "conditions=" + conditions +
+                ", logical='" + logical + '\'' +
+                ", thenAction=" + thenAction +
+                ", elseAction=" + elseAction +
+                ", type='" + type + '\'' +
+                ", entity='" + entity + '\'' +
+                ", property='" + property + '\'' +
+                '}';
     }
 }

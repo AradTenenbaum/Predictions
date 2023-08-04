@@ -1,16 +1,32 @@
 package com.predict.engine.def;
 
 public class Calculation extends Action {
-    private Property resultProp;
-    private String type;
-    private int arg1;
-    private int arg2;
+    public static enum TYPES {
+        NO_TYPE, MULT, DIV
+    }
+    private String resultProp;
+    private TYPES calcType;
+    private String arg1;
+    private String arg2;
 
-    public Calculation(String type, Entity entity, Property property, Property resultProp, String type1, int arg1, int arg2) {
-        super(type, entity, property);
+    public Calculation(String entity, String resultProp, TYPES calcType, String arg1, String arg2) {
+        super(ActionType.CALCULATION, entity);
         this.resultProp = resultProp;
-        this.type = type1;
+        this.calcType = calcType;
         this.arg1 = arg1;
         this.arg2 = arg2;
+    }
+
+    @Override
+    public String toString() {
+        return "Calculation{" +
+                "resultProp='" + resultProp + '\'' +
+                ", calcType=" + calcType +
+                ", arg1='" + arg1 + '\'' +
+                ", arg2='" + arg2 + '\'' +
+                ", type='" + type + '\'' +
+                ", entity='" + entity + '\'' +
+                ", property='" + property + '\'' +
+                '}';
     }
 }

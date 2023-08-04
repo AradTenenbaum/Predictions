@@ -10,4 +10,14 @@ public class World {
     private Map<String, Entity> entities = new HashMap<>();
     private List<Rule> rules = new ArrayList<>();
     private Termination termination;
+
+    public World(Environment environment, Map<String, Entity> entities, List<Rule> rules, Termination termination) {
+        this.environment = environment;
+        this.entities = entities;
+        this.rules = rules;
+        this.termination = termination;
+    }
+
+    public World() {
+    }
 }

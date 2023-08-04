@@ -8,4 +8,12 @@ public class Termination {
         this.ticks = ticks;
         this.seconds = seconds;
     }
+
+    @Override
+    public String toString() {
+        return "Termination{" +
+                "ticks=" + ticks +
+                ", seconds=" + seconds +
+                '}';
+    }
 }
