@@ -1,30 +1,34 @@
 package com.predict.engine.def;
 
-public class Property<T> {
+public class Property {
     private String name;
     private Range range;
     private Boolean isRandom;
-    private T init;
+    private String type;
+    private String init;
 
-    public Property(String name, Range range, Boolean isRandom, T init) {
+    public Property(String name, Range range, Boolean isRandom, String init, String type) {
         this.name = name;
         this.range = range;
         this.isRandom = isRandom;
         this.init = init;
+        this.type = type;
     }
 
 
 
-    public Property(String name, Range range) {
+    public Property(String name, Range range, String type) {
         this.name = name;
         this.range = range;
+        this.type = type;
     }
 
-    public Property(String name) {
+    public Property(String name, String type) {
         this.name = name;
+        this.type = type;
     }
 
-    public void setInit(T init) {
+    public void setInit(String init) {
         this.init = init;
     }
 
@@ -38,6 +42,18 @@ public class Property<T> {
 
     public String getName() {
         return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Range getRange() {
+        return range;
+    }
+
+    public Boolean getRandom() {
+        return isRandom;
     }
 
     @Override

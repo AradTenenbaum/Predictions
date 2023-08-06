@@ -13,4 +13,8 @@ public class Environment {
     public void addProperty(Property p) {
         properties.put(p.getName(), p);
     }
+
+    public Map<String, Property> getProperties() {
+        return properties;
+    }
 }

@@ -18,6 +18,22 @@ public class World {
         this.termination = termination;
     }
 
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public Map<String, Entity> getEntities() {
+        return entities;
+    }
+
+    public List<Rule> getRules() {
+        return rules;
+    }
+
+    public Termination getTermination() {
+        return termination;
+    }
+
     public World() {
     }
 }

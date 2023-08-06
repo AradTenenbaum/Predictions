@@ -18,8 +18,16 @@ public class Entity {
         properties.put(p.getName(), p);
     }
 
+    public Map<String, Property> getProperties() {
+        return properties;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public int getPopulation() {
+        return population;
     }
 
     @Override

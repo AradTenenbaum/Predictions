@@ -9,6 +9,14 @@ public class Termination {
         this.seconds = seconds;
     }
 
+    public int getTicks() {
+        return ticks;
+    }
+
+    public int getSeconds() {
+        return seconds;
+    }
+
     @Override
     public String toString() {
         return "Termination{" +

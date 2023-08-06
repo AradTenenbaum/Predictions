@@ -1,6 +1,7 @@
 package com.predict.engine.def;
 
-import java.util.ArrayList;
+import com.predict.engine.def.action.Action;
+
 import java.util.List;
 
 public class Rule {
@@ -19,6 +20,22 @@ public class Rule {
         this.ticks = ticks;
         this.probability = probability;
         this.actions = actions;
+    }
+
+    public List<Action> getActions() {
+        return actions;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getTicks() {
+        return ticks;
+    }
+
+    public double getProbability() {
+        return probability;
     }
 
     @Override
