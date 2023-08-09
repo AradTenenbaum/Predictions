@@ -12,4 +12,16 @@ public class EntityDto {
         this.population = population;
         this.properties = properties;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPopulation() {
+        return population;
+    }
+
+    public List<PropertyDto> getProperties() {
+        return properties;
+    }
 }

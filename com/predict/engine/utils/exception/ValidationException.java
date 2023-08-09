@@ -1,4 +1,4 @@
-package com.predict.engine.utils.exceptions;
+package com.predict.engine.utils.exception;
 
 public class ValidationException extends Exception {
     public ValidationException() {

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class WorldDto {
+    private EnvironmentDto environment;
     private List<EntityDto> entities;
     private List<RuleDto> rules;
     private TerminationDto termination;
@@ -18,6 +19,13 @@ public class WorldDto {
     public WorldDto(World world) {
         this.entities = new ArrayList<>();
         this.rules = new ArrayList<>();
+        List<PropertyDto> envProperties = new ArrayList<>();
+
+        world.getEnvironment().getProperties().forEach((s, property) -> {
+            envProperties.add(new PropertyDto(s, property.getType(), property.getRange()));
+        });
+
+        this.environment = new EnvironmentDto(envProperties);
 
         for(Map.Entry<String, Entity> e : world.getEntities().entrySet()) {
             List<PropertyDto> properties = new ArrayList<>();
@@ -34,5 +42,21 @@ public class WorldDto {
         }
 
         this.termination = new TerminationDto(world.getTermination().getSeconds(), world.getTermination().getTicks());
+    }
+
+    public List<EntityDto> getEntities() {
+        return entities;
+    }
+
+    public List<RuleDto> getRules() {
+        return rules;
+    }
+
+    public TerminationDto getTermination() {
+        return termination;
+    }
+
+    public EnvironmentDto getEnvironment() {
+        return environment;
     }
 }

@@ -14,4 +14,20 @@ public class RuleDto {
         this.ticks = ticks;
         this.actions = actions;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public Double getProbability() {
+        return probability;
+    }
+
+    public int getTicks() {
+        return ticks;
+    }
+
+    public List<String> getActions() {
+        return actions;
+    }
 }

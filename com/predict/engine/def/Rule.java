@@ -3,6 +3,7 @@ package com.predict.engine.def;
 import com.predict.engine.def.action.Action;
 
 import java.util.List;
+import java.util.Random;
 
 public class Rule {
     private String name;
@@ -36,6 +37,12 @@ public class Rule {
 
     public double getProbability() {
         return probability;
+    }
+
+    public Boolean isActive(int simulationTicks) {
+        Random random = new Random();
+        double randomValue = random.nextDouble();
+        return ((randomValue < probability) && (simulationTicks > 0 && simulationTicks % ticks == 0));
     }
 
     @Override

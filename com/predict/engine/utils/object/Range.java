@@ -1,4 +1,4 @@
-package com.predict.engine.def;
+package com.predict.engine.utils.object;
 
 import java.util.Random;
 
@@ -15,6 +15,14 @@ public class Range {
         Random rand = new Random();
         int randomInteger = (int)Math.floor(Math.random() * (to - from + 1) + to);
         return randomInteger;
+    }
+
+    public double getFrom() {
+        return from;
+    }
+
+    public double getTo() {
+        return to;
     }
 
     @Override

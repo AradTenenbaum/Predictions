@@ -11,8 +11,9 @@ import com.predict.engine.def.action.condition.Condition;
 import com.predict.engine.def.action.condition.MultipleCondition;
 import com.predict.engine.def.action.condition.SingleCondition;
 import com.predict.engine.simulation.Manager;
-import com.predict.engine.utils.exceptions.FileException;
-import com.predict.engine.utils.exceptions.ValidationException;
+import com.predict.engine.utils.exception.FileException;
+import com.predict.engine.utils.exception.ValidationException;
+import com.predict.engine.utils.object.Range;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -32,7 +33,7 @@ public class File {
     private static List<Rule> rules;
     private static Termination termination;
 
-    public static WorldDto fetchDataFromFile(String path, Manager manager) throws ValidationException, FileException {
+    public static void fetchDataFromFile(String path, Manager manager) throws ValidationException, FileException, Exception {
         try {
 
             InputStream inputStream = new FileInputStream(new java.io.File(path));
@@ -53,13 +54,15 @@ public class File {
             WorldDto sharedWorld = new WorldDto(world);
             manager.setCurrentWorld(world);
             manager.setSharedWorld(sharedWorld);
-
-            return sharedWorld;
+            manager.setValidWorld(true);
+            System.out.println("File was loaded successfully");
 
         } catch (JAXBException e) {
             throw new ValidationException("File might not match scheme");
         } catch (FileNotFoundException e) {
             throw new FileException("File not found. try a different path");
+        } catch (Exception e) {
+            throw new Exception("The is an error. please try again");
         }
     }
 
@@ -75,7 +78,6 @@ public class File {
             } catch (ValidationException e) {
                 throw new ValidationException("Environment -> " + e.getMessage());
             }
-            System.out.println(p.toString());
             environment.addProperty(p);
         }
 
@@ -86,7 +88,6 @@ public class File {
         Map<String, Entity> entities = new HashMap<>();
         for(PRDEntity fileEntity : fileEntities.getPRDEntity()) {
             Entity e = buildEntity(fileEntity);
-            System.out.println(e.toString());
             entities.put(e.getName(), e);
         }
         return entities;
@@ -110,7 +111,6 @@ public class File {
         List<Rule> rules = new ArrayList<>();
         for(PRDRule fileRule : fileRules.getPRDRule()) {
             Rule r = buildRule(fileRule);
-            System.out.println(r);
             rules.add(r);
         }
         return rules;
@@ -143,6 +143,15 @@ public class File {
         return actions;
     }
 
+    private static List<Action> buildActionsList(List<PRDAction> fileActions) throws ValidationException {
+        List<Action> actions = new ArrayList<>();
+        for(PRDAction fileAction : fileActions) {
+            Action a = buildAction(fileAction);
+            actions.add(a);
+        }
+        return actions;
+    }
+
     private static Action buildAction(PRDAction fileAction) throws ValidationException {
         if(fileAction.getType().equals(ActionType.INCREASE) || fileAction.getType().equals(ActionType.DECREASE) ) {
             Validation.isEntityPropertyExists(entities, fileAction.getEntity(), fileAction.getProperty());
@@ -159,7 +168,7 @@ public class File {
         else if(fileAction.getType().equals(ActionType.CALCULATION)) {
             Validation.isEntityPropertyExists(entities, fileAction.getEntity(), fileAction.getResultProp());
 
-            Calculation.TYPES type = Calculation.TYPES.NO_TYPE;
+            Calculation.TYPES type;
             String arg1 = "", arg2 = "";
             if(fileAction.getPRDMultiply() != null) {
                 type = Calculation.TYPES.MULT;
@@ -191,14 +200,16 @@ public class File {
             Validation.isEntityExists(entities, fileAction.getEntity());
             return new Action(fileAction.getType(), fileAction.getEntity());
         }
-        return new Action();
+        else {
+            throw new ValidationException("'" + fileAction.getType() +"' is not a valid action type");
+        }
     }
 
     private static Condition buildCondition(PRDCondition fileCondition, String entity, String property, PRDThen fileThen, PRDElse fileElse, Condition.TYPE t) throws ValidationException {
-        Action thenAction = null, elseAction = null;
+        List<Action> thenAction = null, elseAction = null;
         if(t == Condition.TYPE.OUTER) {
-            thenAction = buildAction(fileThen.getPRDAction().get(0));
-            if(fileElse != null) elseAction = buildAction(fileElse.getPRDAction().get(0));
+            thenAction = buildActionsList(fileThen.getPRDAction());
+            if(fileElse != null) elseAction = buildActionsList(fileElse.getPRDAction());
         }
 
         if(fileCondition.getSingularity().equals(Condition.SINGLE)) {
@@ -272,8 +283,9 @@ public class File {
         }
         else if(fileProp.getPRDValue().getInit() != null && fileProp.getPRDValue().getInit().length() > 0) {
             try {
-                Validation.isValidByRange(fileProp.getPRDValue().getInit(), fileProp.getPRDRange().getFrom(), fileProp.getPRDRange().getTo());
+                p.setRandom(false);
                 Validation.isValueFromType(fileProp.getType(), fileProp.getPRDValue().getInit());
+                if((fileProp.getType().equals(PropertyType.DECIMAL) || fileProp.getType().equals(PropertyType.FLOAT)) && fileProp.getPRDRange() != null) Validation.isValidByRange(fileProp.getPRDValue().getInit(), fileProp.getPRDRange().getFrom(), fileProp.getPRDRange().getTo());
             } catch (ValidationException e) {
                 throw new ValidationException("Property: " + fileProp.getPRDName() + " -> " + e.getMessage());
             }

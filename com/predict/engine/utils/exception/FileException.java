@@ -1,4 +1,4 @@
-package com.predict.engine.utils.exceptions;
+package com.predict.engine.utils.exception;
 
 public class FileException extends Exception {
     public FileException() {

@@ -8,4 +8,12 @@ public class TerminationDto {
         this.seconds = seconds;
         this.ticks = ticks;
     }
+
+    public int getSeconds() {
+        return seconds;
+    }
+
+    public int getTicks() {
+        return ticks;
+    }
 }

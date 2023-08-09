@@ -1,5 +1,9 @@
 package com.predict.engine.def;
 
+import com.predict.engine.utils.func.Convert;
+import com.predict.engine.utils.func.RandomGenerator;
+import com.predict.engine.utils.object.Range;
+
 public class Property {
     private String name;
     private Range range;
@@ -54,6 +58,37 @@ public class Property {
 
     public Boolean getRandom() {
         return isRandom;
+    }
+
+    public Object generateValue() {
+        if(type.equals(PropertyType.DECIMAL) || type.equals(PropertyType.FLOAT)) {
+            if(init != null && !isRandom) {
+                if(type.equals(PropertyType.DECIMAL)) return Convert.stringToInteger(init);
+                else if(type.equals(PropertyType.FLOAT)) return Convert.stringToDouble(init);
+            } else {
+                if(isRandom && range != null) {
+                    if(type.equals(PropertyType.DECIMAL)) return RandomGenerator.getInt(range);
+                    else if(type.equals(PropertyType.FLOAT)) return RandomGenerator.getDouble(range);
+                }
+            }
+        } else if (type.equals(PropertyType.BOOLEAN)) {
+            if(init != null && !isRandom) {
+                return Convert.stringToBoolean(init);
+            } else {
+                if(isRandom) {
+                    return RandomGenerator.getBoolean();
+                }
+            }
+        } else if (type.equals(PropertyType.STRING)) {
+            if(init != null && !isRandom) {
+                return init;
+            } else {
+                if(isRandom) {
+                    return RandomGenerator.getString(25);
+                }
+            }
+        }
+        return null;
     }
 
     @Override

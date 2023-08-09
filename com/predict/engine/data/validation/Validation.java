@@ -4,7 +4,7 @@ import com.predict.engine.def.Entity;
 import com.predict.engine.def.Environment;
 import com.predict.engine.def.Function;
 import com.predict.engine.def.PropertyType;
-import com.predict.engine.utils.exceptions.ValidationException;
+import com.predict.engine.utils.exception.ValidationException;
 
 import java.util.Map;
 
@@ -41,15 +41,16 @@ public class Validation {
     }
 
     public static void isValueFromType(String type, String value) throws ValidationException {
-        if(type.equals(PropertyType.DECIMAL) || type.equals(PropertyType.FLOAT)) {
-            if(!isNumeric(value)) throw new ValidationException("'" + value + "' is not of type '" + type + "'");
-        }
-        else if(type.equals(PropertyType.BOOLEAN)) {
+        if(type.equals(PropertyType.DECIMAL)) {
+            if(!isInteger(value)) throw new ValidationException("'" + value + "' is not of type '" + type + "'");
+        } else if(type.equals(PropertyType.FLOAT)) {
+            if(!isDouble(value)) throw new ValidationException("'" + value + "' is not of type '" + type + "'");
+        } else if(type.equals(PropertyType.BOOLEAN)) {
             if(!isBoolean(value)) throw new ValidationException("'" + value + "' is not of type '" + type + "'");
         }
+        // TODO: add validation for string - cannot be a number
     }
 
-    // TODO: test the function, the current file not contain a calculation
     public static void calculationValidation(Environment environment, Map<String, Entity> entities, String entity, String resultProp, String arg1, String arg2) throws ValidationException {
         String type = entities.get(entity).getProperties().get(resultProp).getType();
         String func1 = Function.whichFunction(arg1);
@@ -88,13 +89,27 @@ public class Validation {
 
     public static boolean isNumeric(String str) {
         // TODO: check if type is decimal and value is float
+        return isDouble(str);
+    }
+
+    public static boolean isInteger(String value) {
         try {
-            Double.parseDouble(str); // Use Integer.parseInt() for integers
+            Integer.parseInt(value);
             return true;
         } catch (NumberFormatException e) {
             return false;
         }
     }
+
+    public static boolean isDouble(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 
     public static boolean isBoolean(String str) {
         return (str.equals("true") || str.equals("false"));
