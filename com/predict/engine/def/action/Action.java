@@ -1,6 +1,7 @@
 package com.predict.engine.def.action;
 
 import com.predict.engine.def.Function;
+import com.predict.engine.def.Property;
 import com.predict.engine.def.PropertyType;
 import com.predict.engine.ins.EntityInstance;
 import com.predict.engine.ins.environment.EnvironmentInstance;
@@ -12,17 +13,17 @@ import com.predict.engine.utils.object.Range;
 public class Action {
     protected String type;
     protected String entity;
-    protected String property;
+    protected Property property;
     private String by;
 
-    public Action(String type, String entity, String property, String by) {
+    public Action(String type, String entity, Property property, String by) {
         this.type = type;
         this.entity = entity;
         this.property = property;
         this.by = by;
     }
 
-    public Action(String type, String entity, String property) {
+    public Action(String type, String entity, Property property) {
         this.type = type;
         this.entity = entity;
         this.property = property;
@@ -44,19 +45,20 @@ public class Action {
         return entity;
     }
 
-    public String getProperty() {
+    public Property getProperty() {
         return property;
     }
 
     public void invoke(EntityInstance entityInstance, EnvironmentInstance env) throws SimulationException {
+        // TODO: handle range check when changing value
         String propType = "";
         Object propValue = "";
         String val = "";
 
         // In case the action is kill, there is no property
         if(property != null) {
-            propType = entityInstance.getPropertyType(property);
-            propValue = entityInstance.getPropertyValue(property);
+            propType = property.getType();
+            propValue = entityInstance.getPropertyValue(property.getName());
             val = Function.getFuncInput(by, propType, env);
         }
 
@@ -64,11 +66,11 @@ public class Action {
             if(propType.equals(PropertyType.DECIMAL)) {
                 Integer value = Convert.stringToInteger(val);
                 Integer result = (type.equals(ActionType.INCREASE) ? value + (Integer)propValue : value - (Integer)propValue);
-                entityInstance.setProperty(property, result);
+                if (property.getRange().on(result.doubleValue())) entityInstance.setProperty(property.getName(), result);
             } else if(propType.equals(PropertyType.FLOAT)) {
                 Double value = Convert.stringToDouble(val);
                 Double result = (type.equals(ActionType.INCREASE) ? value + (Double) propValue : value - (Double) propValue);
-                entityInstance.setProperty(property, result);
+                if (property.getRange().on(result)) entityInstance.setProperty(property.getName(), result);
             } else {
                 throw new SimulationException("type " + propType +" is not valid for this action");
             }
@@ -76,13 +78,16 @@ public class Action {
             entityInstance.kill();
         } else if(type.equals(ActionType.SET)) {
             if(PropertyType.isDecimal(propType)) {
-                entityInstance.setProperty(property, Convert.stringToInteger(val));
+                Integer result = Convert.stringToInteger(val);
+                if(property.getRange().on(result.doubleValue())) entityInstance.setProperty(property.getName(), result);
             } else if(PropertyType.isFloat(propType)) {
-                entityInstance.setProperty(property, Convert.stringToDouble(val));
+                Double result = Convert.stringToDouble(val);
+                if(property.getRange().on(result)) entityInstance.setProperty(property.getName(), result);
             } else if (PropertyType.isBoolean(propType)) {
-                entityInstance.setProperty(property, Convert.stringToBoolean(val));
+                Boolean result = Convert.stringToBoolean(val);
+                entityInstance.setProperty(property.getName(), result);
             } else {
-                entityInstance.setProperty(property, val);
+                entityInstance.setProperty(property.getName(), val);
             }
         } else {
             throw new SimulationException("action " + type +" is not a valid action");

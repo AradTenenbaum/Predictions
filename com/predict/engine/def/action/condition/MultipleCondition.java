@@ -1,5 +1,6 @@
 package com.predict.engine.def.action.condition;
 
+import com.predict.engine.def.Property;
 import com.predict.engine.def.action.Action;
 import com.predict.engine.def.action.condition.Condition;
 import com.predict.engine.ins.EntityInstance;
@@ -14,7 +15,7 @@ public class MultipleCondition extends Condition {
     private List<Condition> conditions;
     private String logical;
 
-    public MultipleCondition(String entity, String property, List<Action> thenActions, List<Action> elseActions, List<Condition> conditions, String logical) {
+    public MultipleCondition(String entity, Property property, List<Action> thenActions, List<Action> elseActions, List<Condition> conditions, String logical) {
         super(entity, property, thenActions, elseActions);
         this.conditions = conditions;
         this.logical = logical;

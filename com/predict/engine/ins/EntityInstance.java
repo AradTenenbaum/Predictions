@@ -28,6 +28,10 @@ public class EntityInstance {
         return properties.get(property).getType();
     }
 
+    public Map<String, PropertyInstance> getProperties() {
+        return properties;
+    }
+
     public Boolean hasProperty(String property) {
         return properties.containsKey(property);
     }

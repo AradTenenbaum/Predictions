@@ -84,7 +84,7 @@ public class Property {
                 return init;
             } else {
                 if(isRandom) {
-                    return RandomGenerator.getString(25);
+                    return RandomGenerator.getString();
                 }
             }
         }

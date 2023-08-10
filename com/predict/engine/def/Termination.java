@@ -1,6 +1,9 @@
 package com.predict.engine.def;
 
 public class Termination {
+    public static enum REASONS {
+        TICKS, SECONDS
+    }
     private int ticks;
     private int seconds;
 

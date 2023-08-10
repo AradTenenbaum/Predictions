@@ -32,7 +32,7 @@ public class File {
     private static Map<String, Entity> entities;
     private static List<Rule> rules;
     private static Termination termination;
-
+    // TODO: trim strings
     public static void fetchDataFromFile(String path, Manager manager) throws ValidationException, FileException, Exception {
         try {
 
@@ -59,10 +59,12 @@ public class File {
 
         } catch (JAXBException e) {
             throw new ValidationException("File might not match scheme");
+        } catch (ValidationException e) {
+            throw new ValidationException(e.getMessage());
         } catch (FileNotFoundException e) {
             throw new FileException("File not found. try a different path");
         } catch (Exception e) {
-            throw new Exception("The is an error. please try again");
+            throw new Exception("There is an error. please try again");
         }
     }
 
@@ -117,11 +119,14 @@ public class File {
     }
 
     private static Rule buildRule(PRDRule fileRule) throws ValidationException {
-        List<Action> actions = new ArrayList<>();
+        String trimmedName = fileRule.getName().trim();
+
+        List<Action> actions;
         try {
+            Validation.stringNoSpaceValidation(trimmedName);
             actions = buildActions(fileRule.getPRDActions());
         } catch (ValidationException e) {
-            throw new ValidationException("Rule: " + fileRule.getName() + " -> " + e.getMessage());
+            throw new ValidationException("Rule: " + trimmedName + " -> " + e.getMessage());
         }
 
         int ticks = 1;
@@ -130,7 +135,8 @@ public class File {
             if(fileRule.getPRDActivation().getTicks() != null) ticks = fileRule.getPRDActivation().getTicks();
             if(fileRule.getPRDActivation().getProbability() != null) probability = fileRule.getPRDActivation().getProbability();
         }
-        Rule r = new Rule(fileRule.getName(), ticks, probability, actions);
+
+        Rule r = new Rule(trimmedName, ticks, probability, actions);
         return r;
     }
 
@@ -163,7 +169,7 @@ public class File {
             else {
                 throw new ValidationException("action increase/decrease have to receive a by value");
             }
-            return new Action(fileAction.getType(), fileAction.getEntity(), fileAction.getProperty(), fileAction.getBy());
+            return new Action(fileAction.getType(), fileAction.getEntity(), entities.get(fileAction.getEntity()).getProperties().get(fileAction.getProperty()), fileAction.getBy());
         }
         else if(fileAction.getType().equals(ActionType.CALCULATION)) {
             Validation.isEntityPropertyExists(entities, fileAction.getEntity(), fileAction.getResultProp());
@@ -194,7 +200,7 @@ public class File {
         else if(fileAction.getType().equals(ActionType.SET)) {
             Validation.isEntityPropertyExists(entities, fileAction.getEntity(), fileAction.getProperty());
             Validation.isTypeValid(environment, entities, fileAction.getEntity(), fileAction.getProperty(), fileAction.getValue());
-            return new Action(fileAction.getType(), fileAction.getEntity(), fileAction.getProperty(), fileAction.getValue());
+            return new Action(fileAction.getType(), fileAction.getEntity(), entities.get(fileAction.getEntity()).getProperties().get(fileAction.getProperty()), fileAction.getValue());
         }
         else if(fileAction.getType().equals(ActionType.KILL)) {
             Validation.isEntityExists(entities, fileAction.getEntity());
@@ -220,7 +226,7 @@ public class File {
             else {
                 throw new ValidationException("condition must contain a value");
             }
-            return new SingleCondition(fileCondition.getEntity(), fileCondition.getProperty(), thenAction, elseAction, fileCondition.getOperator(), fileCondition.getValue());
+            return new SingleCondition(fileCondition.getEntity(), entities.get(fileCondition.getEntity()).getProperties().get(fileCondition.getProperty()), thenAction, elseAction, fileCondition.getOperator(), fileCondition.getValue());
         }
         else if(fileCondition.getSingularity().equals(Condition.MULTIPLE)) {
             List<Condition> conditions = new ArrayList<>();
@@ -228,39 +234,49 @@ public class File {
                 Condition c = buildCondition(c1, entity, property, fileThen, fileElse, Condition.TYPE.INNER);
                 conditions.add(c);
             }
-            return new MultipleCondition(entity, property, thenAction, elseAction, conditions, fileCondition.getLogical());
+            return new MultipleCondition(entity, entities.get(entity).getProperties().get(property), thenAction, elseAction, conditions, fileCondition.getLogical());
         }
         return new Condition();
     }
 
     private static Entity buildEntity(PRDEntity fileEntity) throws ValidationException {
-        Entity entity = new Entity(fileEntity.getName(), fileEntity.getPRDPopulation());
-        for(PRDProperty fileProp : fileEntity.getPRDProperties().getPRDProperty()) {
-            Property p;
-            try {
+        String trimmedName = fileEntity.getName().trim();
+        try {
+            Validation.stringNoSpaceValidation(trimmedName);
+
+            Entity entity = new Entity(trimmedName, fileEntity.getPRDPopulation());
+            for(PRDProperty fileProp : fileEntity.getPRDProperties().getPRDProperty()) {
+                Property p;
                 if(entity.getProperties().containsKey(fileProp.getPRDName())) {
                     throw new ValidationException("'" + fileProp.getPRDName() + "' is declared more than once. Property name must be unique");
                 }
                 p = buildProperty(fileProp);
-            } catch (ValidationException e) {
-                throw new ValidationException("Entity: " + fileEntity.getName() + " -> " + e.getMessage());
+                entity.addProperty(p);
             }
-            entity.addProperty(p);
-        }
 
-        return entity;
+            return entity;
+        } catch (ValidationException e) {
+            throw new ValidationException("Entity: " + trimmedName + " -> " + e.getMessage());
+        }
     }
 
     private static Property buildPropertyByType(String name, String type, PRDRange range) throws ValidationException {
+        String trimmedName = name.trim();
+        try {
+            Validation.stringNoSpaceValidation(trimmedName);
+        } catch (ValidationException e) {
+            throw new ValidationException("Property: " + name + " -> " + e.getMessage());
+        }
+
         Property p;
         if(type.equals(PropertyType.DECIMAL))
-            p = new Property(name, PropertyType.DECIMAL);
+            p = new Property(trimmedName, PropertyType.DECIMAL);
         else if(type.equals(PropertyType.FLOAT))
-            p = new Property(name, PropertyType.FLOAT);
+            p = new Property(trimmedName, PropertyType.FLOAT);
         else if(type.equals(PropertyType.BOOLEAN))
-            p = new Property(name, PropertyType.BOOLEAN);
+            p = new Property(trimmedName, PropertyType.BOOLEAN);
         else if(type.equals(PropertyType.STRING))
-            p = new Property(name, PropertyType.STRING);
+            p = new Property(trimmedName, PropertyType.STRING);
         else
             throw new ValidationException("Property: " + name + " -> " + "type '"+ type +"' is not valid for the system");
 

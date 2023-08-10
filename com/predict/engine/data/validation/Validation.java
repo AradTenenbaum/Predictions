@@ -87,6 +87,10 @@ public class Validation {
         }
     }
 
+    public static void stringNoSpaceValidation(String s) throws ValidationException {
+        if(s.contains(" ")) throw new ValidationException(s + " contains spaces and it is not allowed");
+    }
+
     public static boolean isNumeric(String str) {
         // TODO: check if type is decimal and value is float
         return isDouble(str);

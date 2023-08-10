@@ -1,5 +1,6 @@
 package com.predict.engine.def.action.condition;
 
+import com.predict.engine.def.Property;
 import com.predict.engine.def.action.Action;
 import com.predict.engine.def.action.ActionType;
 import com.predict.engine.ins.EntityInstance;
@@ -18,7 +19,7 @@ public class Condition extends Action {
         OUTER, INNER
     }
 
-    public Condition(String entity, String property, List<Action> thenActions, List<Action> elseActions) {
+    public Condition(String entity, Property property, List<Action> thenActions, List<Action> elseActions) {
         super(ActionType.CONDITION, entity, property);
         this.thenActions = thenActions;
         this.elseActions = elseActions;

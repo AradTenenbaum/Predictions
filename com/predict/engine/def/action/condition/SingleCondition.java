@@ -1,6 +1,7 @@
 package com.predict.engine.def.action.condition;
 
 import com.predict.engine.def.Function;
+import com.predict.engine.def.Property;
 import com.predict.engine.def.PropertyType;
 import com.predict.engine.def.action.Action;
 import com.predict.engine.def.action.condition.Condition;
@@ -21,7 +22,7 @@ public class SingleCondition extends Condition {
     private String operator;
     private String value;
 
-    public SingleCondition(String entity, String property, List<Action> thenActions, List<Action> elseActions, String operator, String value) {
+    public SingleCondition(String entity, Property property, List<Action> thenActions, List<Action> elseActions, String operator, String value) {
         super(entity, property, thenActions, elseActions);
         this.operator = operator;
         this.value = value;
@@ -29,38 +30,38 @@ public class SingleCondition extends Condition {
 
     @Override
     public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env) {
-        String val = Function.getFuncInput(value, entityInstance.getPropertyType(property), env);
+        String val = Function.getFuncInput(value, property.getType(), env);
         Object propValue;
 
         switch (operator) {
             case BT:
-                if(PropertyType.isTypeNumber(entityInstance.getPropertyType(property))) {
-                    if(entityInstance.getPropertyType(property).equals(PropertyType.DECIMAL)) {
+                if(PropertyType.isTypeNumber(property.getType())) {
+                    if(property.getType().equals(PropertyType.DECIMAL)) {
                         // TODO: change convert to somthing better - somtimes gets a double
-                        Integer number = (Integer) entityInstance.getPropertyValue(property);
+                        Integer number = (Integer) entityInstance.getPropertyValue(property.getName());
                         return number > Convert.stringToInteger(val);
-                    } else if (entityInstance.getPropertyType(property).equals(PropertyType.FLOAT)) {
-                        Double number = (Double) entityInstance.getPropertyValue(property);
+                    } else if (entityInstance.getPropertyType(property.getName()).equals(PropertyType.FLOAT)) {
+                        Double number = (Double) entityInstance.getPropertyValue(property.getName());
                         return number > Convert.stringToDouble(val);
                     }
                 }
                 break;
             case LT:
-                if(PropertyType.isTypeNumber(entityInstance.getPropertyType(property))) {
-                    if(entityInstance.getPropertyType(property).equals(PropertyType.DECIMAL)) {
-                        Integer number = (Integer) entityInstance.getPropertyValue(property);
+                if(PropertyType.isTypeNumber(property.getType())) {
+                    if(property.getType().equals(PropertyType.DECIMAL)) {
+                        Integer number = (Integer) entityInstance.getPropertyValue(property.getName());
                         return number < Convert.stringToInteger(val);
-                    } else if (entityInstance.getPropertyType(property).equals(PropertyType.FLOAT)) {
-                        Double number = (Double) entityInstance.getPropertyValue(property);
+                    } else if (property.getType().equals(PropertyType.FLOAT)) {
+                        Double number = (Double) entityInstance.getPropertyValue(property.getName());
                         return number < Convert.stringToDouble(val);
                     }
                 }
                 break;
             case EQUALS:
-                propValue = entityInstance.getPropertyValue(property);
+                propValue = entityInstance.getPropertyValue(property.getName());
                 return ("" + propValue).equals(val);
             case NOT:
-                propValue = entityInstance.getPropertyValue(property);
+                propValue = entityInstance.getPropertyValue(property.getName());
                 return !("" + propValue).equals(val);
             default:
                 break;

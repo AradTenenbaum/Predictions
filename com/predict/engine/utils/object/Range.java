@@ -17,6 +17,10 @@ public class Range {
         return randomInteger;
     }
 
+    public Boolean on(Double value) {
+        return (value >= from && value <= to);
+    }
+
     public double getFrom() {
         return from;
     }

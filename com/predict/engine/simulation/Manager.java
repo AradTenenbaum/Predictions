@@ -1,6 +1,7 @@
 package com.predict.engine.simulation;
 
 import com.predict.engine.data.dto.WorldDto;
+import com.predict.engine.def.Termination;
 import com.predict.engine.def.World;
 import com.predict.engine.ins.EntityInstance;
 import com.predict.engine.ins.PropertyInstance;
@@ -48,7 +49,8 @@ public class Manager {
         return history.getSimulationById(id);
     }
 
-    public void runSimulation(EnvironmentInstance env) throws SimulationException, RuntimeException {
+    // TODO: check if instance passes it's range
+    public Simulation runSimulation(EnvironmentInstance env) throws SimulationException, RuntimeException {
         if(currentWorld == null && !isValidWorld) {
             throw new SimulationException("no valid file was loaded. please load a file to run this action");
         }
@@ -95,23 +97,23 @@ public class Manager {
         }
 
         // Testing simulation
-        entities.forEach(((s, entityInstances) -> {
-            entityInstances.forEach(entityInstance -> {
-                System.out.println(entityInstance.toString());
-            });
-        }));
+//        entities.forEach(((s, entityInstances) -> {
+//            entityInstances.forEach(entityInstance -> {
+//                System.out.println(entityInstance.toString());
+//            });
+//        }));
         // Testing simulation
 
-        Simulation s = new Simulation(entities, new Date());
-        System.out.print("Simulation "+ s.getId() +" stopped: ");
+        Simulation s = new Simulation(entities, new Date(), sharedWorld);
 
         if(!(ticks < currentWorld.getTermination().getTicks())) {
-            System.out.println("Passed " + currentWorld.getTermination().getTicks() + " ticks");
+            s.setTerminationReason(Termination.REASONS.TICKS);
         } else {
-            System.out.println("Passed " + currentWorld.getTermination().getSeconds() + " seconds");
+            s.setTerminationReason(Termination.REASONS.SECONDS);
         }
 
         history.saveSimulation(s);
-        // TODO: return the results and not print them
+
+        return s;
     }
 }

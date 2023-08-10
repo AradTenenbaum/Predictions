@@ -6,10 +6,10 @@ import com.predict.engine.data.dto.WorldDto;
 import com.predict.engine.data.source.File;
 import com.predict.engine.data.validation.Validation;
 import com.predict.engine.def.PropertyType;
+import com.predict.engine.def.Termination;
 import com.predict.engine.ins.EntityInstance;
 import com.predict.engine.ins.environment.EnvironmentInstance;
 import com.predict.engine.ins.environment.EnvironmentInstanceImpl;
-import com.predict.engine.simulation.History;
 import com.predict.engine.simulation.Manager;
 import com.predict.engine.simulation.Simulation;
 import com.predict.engine.utils.exception.FileException;
@@ -17,12 +17,15 @@ import com.predict.engine.utils.exception.SimulationException;
 import com.predict.engine.utils.exception.ValidationException;
 import com.predict.engine.utils.func.RandomGenerator;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Menu {
-
+    // TODO: validate user input
     private Manager manager;
 
     public Menu(Manager manager) {
@@ -55,7 +58,16 @@ public class Menu {
             else {
                 try {
                     EnvironmentInstance env = createEnvironment(manager.getSharedWorld().getEnvironment());
-                    manager.runSimulation(env);
+                    Simulation s = manager.runSimulation(env);
+
+                    System.out.println("Ended simulation " + s.getId());
+
+                    if(s.getTerminationReason() == Termination.REASONS.TICKS) {
+                        System.out.println("Passed " + manager.getSharedWorld().getTermination().getTicks() + " ticks");
+                    } else if(s.getTerminationReason() == Termination.REASONS.SECONDS) {
+                        System.out.println("Passed " + manager.getSharedWorld().getTermination().getSeconds() + " seconds");
+                    }
+
                 } catch (RuntimeException | SimulationException e) {
                     System.out.println(e.getMessage());
                 }
@@ -107,20 +119,51 @@ public class Menu {
                         simulationDisplayChoice = scanner.nextInt();
                         if(simulationDisplayChoice == 1) {
                             chosenSimulation.getEntities().forEach((s, entityInstances) -> {
-                                Optional<EntityDto> entity = manager.getSharedWorld().
+                                Optional<EntityDto> entity = chosenSimulation.getWorldDto().
                                         getEntities().
                                         stream().
                                         filter(entityDto -> entityDto.getName().equals(s)).
                                         findFirst();
-                                int aliveAmount = 0;
-                                for(EntityInstance entityIns : chosenSimulation.getEntities().get(s)) {
-                                    if(entityIns.getAlive()) aliveAmount++;
-                                }
-                                System.out.println("Entity: " + s + " amount before run: " + entity.get().getPopulation() + " amount after run: " +
-                                        aliveAmount);
+                                long aliveAmount = chosenSimulation.getEntities().get(s)
+                                        .stream()
+                                        .filter(EntityInstance::getAlive)
+                                        .count();
+
+                                entity.ifPresent(entityDto -> System.out.println("Entity: " + s + " amount before run: " + entityDto.getPopulation() + " amount after run: " + aliveAmount));
                             });
                         } else if (simulationDisplayChoice == 2) {
+                            // TODO: The property group by value
+                            System.out.println("Choose Entity:");
+                            AtomicInteger i = new AtomicInteger();
+                            chosenSimulation.getEntities().forEach((s, entityInstances) -> {
+                                System.out.println((i.incrementAndGet()) + ". " + s);
+                            });
 
+                            scanner.nextLine();
+                            System.out.print("entity: ");
+                            String entityChosen = scanner.nextLine();
+
+                            if(chosenSimulation.getEntities().containsKey(entityChosen)) {
+                                List<EntityInstance> entityInstances = chosenSimulation.getEntities().get(entityChosen);
+                                System.out.println("Choose Property:");
+                                AtomicInteger j = new AtomicInteger();
+                                entityInstances.get(0).getProperties().forEach((s, propertyInstance) -> {
+                                    System.out.println(j.incrementAndGet() + ". " + s);
+                                });
+                                System.out.print("property: ");
+                                String propertyChosen = scanner.nextLine();
+                                if(entityInstances.get(0).hasProperty(propertyChosen)) {
+                                    Map<Object, List<EntityInstance>> entitiesByProperty = entityInstances.stream()
+                                            .collect(Collectors.groupingBy(entityInstance -> entityInstance.getPropertyValue(propertyChosen)));
+                                    entitiesByProperty.forEach((value, entities) -> {
+                                        System.out.println(propertyChosen + ": " + value + " amount: " + entities.stream().filter(EntityInstance::getAlive).count());
+                                    });
+                                } else {
+                                    System.out.println("Property does not exists");
+                                }
+                            } else {
+                                System.out.println("Entity does not exists");
+                            }
                         }
                     }
 

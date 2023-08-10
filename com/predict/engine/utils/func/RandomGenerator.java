@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Random;
 
 public class RandomGenerator {
-    private static String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789().-_,?!";
-    public static String getString(int length) {
+    private static String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789().-_,?! ";
+    public static String getString() {
+        int length = getInt(new Range(1, 50));
         Random random = new Random();
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < length; i++) {
@@ -48,7 +49,8 @@ public class RandomGenerator {
         } else if (type.equals(PropertyType.BOOLEAN)) {
             return "" + getBoolean();
         } else if(type.equals(PropertyType.STRING)) {
-            return getString(10);
+
+            return getString();
         }
         return null;
     }
