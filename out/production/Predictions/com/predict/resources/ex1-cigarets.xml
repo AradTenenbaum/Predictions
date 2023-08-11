@@ -43,7 +43,7 @@
 			</PRD-actions>
 			<PRD-activation ticks="12"/>
 		</PRD-rule>
-		<PRD-rule name="got cancer">
+		<PRD-rule name="got-cancer">
 			<PRD-actions>
 				<PRD-action entity="Smoker" type="condition">
 					<PRD-condition singularity="multiple" logical="and">

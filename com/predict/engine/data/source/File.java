@@ -32,7 +32,6 @@ public class File {
     private static Map<String, Entity> entities;
     private static List<Rule> rules;
     private static Termination termination;
-    // TODO: trim strings
     public static void fetchDataFromFile(String path, Manager manager) throws ValidationException, FileException, Exception {
         try {
 
@@ -192,7 +191,7 @@ public class File {
 
             Validation.calculationValidation(environment, entities, fileAction.getEntity(), fileAction.getResultProp(), arg1, arg2);
 
-            return new Calculation(fileAction.getEntity(), fileAction.getResultProp(), type, arg1, arg2);
+            return new Calculation(fileAction.getEntity(), entities.get(fileAction.getEntity()).getProperties().get(fileAction.getResultProp()), type, arg1, arg2);
         }
         else if(fileAction.getType().equals(ActionType.CONDITION)) {
             return buildCondition(fileAction.getPRDCondition(), fileAction.getEntity(), fileAction.getProperty(), fileAction.getPRDThen(), fileAction.getPRDElse(), Condition.TYPE.OUTER);

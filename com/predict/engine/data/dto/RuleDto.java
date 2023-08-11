@@ -1,8 +1,9 @@
 package com.predict.engine.data.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class RuleDto {
+public class RuleDto implements Serializable {
     private String name;
     private Double probability;
     private int ticks;

@@ -37,7 +37,6 @@ public class SingleCondition extends Condition {
             case BT:
                 if(PropertyType.isTypeNumber(property.getType())) {
                     if(property.getType().equals(PropertyType.DECIMAL)) {
-                        // TODO: change convert to somthing better - somtimes gets a double
                         Integer number = (Integer) entityInstance.getPropertyValue(property.getName());
                         return number > Convert.stringToInteger(val);
                     } else if (entityInstance.getPropertyType(property.getName()).equals(PropertyType.FLOAT)) {

@@ -2,10 +2,11 @@ package com.predict.engine.def;
 
 import com.predict.engine.def.action.Action;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
-public class Rule {
+public class Rule implements Serializable {
     private String name;
     private int ticks = 1;
     private double probability = 1;

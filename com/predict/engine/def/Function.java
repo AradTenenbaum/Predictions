@@ -14,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Function {
-    // TODO: check valid conversions between values
     public static String ENVIRONMENT =  "environment";
     public static String RANDOM =  "random";
 

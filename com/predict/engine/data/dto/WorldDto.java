@@ -6,11 +6,12 @@ import com.predict.engine.def.Rule;
 import com.predict.engine.def.World;
 import com.predict.engine.def.action.Action;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class WorldDto {
+public class WorldDto implements Serializable {
     private EnvironmentDto environment;
     private List<EntityDto> entities;
     private List<RuleDto> rules;

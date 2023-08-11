@@ -1,8 +1,9 @@
 package com.predict.engine.data.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EntityDto {
+public class EntityDto implements Serializable {
     private String name;
     private int population;
     private List<PropertyDto> properties;

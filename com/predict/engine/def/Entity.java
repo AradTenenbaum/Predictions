@@ -1,9 +1,10 @@
 package com.predict.engine.def;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Entity {
+public class Entity implements Serializable {
     private String name;
     private Map<String, Property> properties;
     private int population;

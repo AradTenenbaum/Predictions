@@ -47,8 +47,11 @@ public class Validation {
             if(!isDouble(value)) throw new ValidationException("'" + value + "' is not of type '" + type + "'");
         } else if(type.equals(PropertyType.BOOLEAN)) {
             if(!isBoolean(value)) throw new ValidationException("'" + value + "' is not of type '" + type + "'");
+        } else if (type.equals(PropertyType.STRING)) {
+            if(isNumeric(value)) throw new ValidationException("'" + value + "' of type string cannot be a number");
+        } else {
+            throw new ValidationException("'" + type + "' is not a valid type");
         }
-        // TODO: add validation for string - cannot be a number
     }
 
     public static void calculationValidation(Environment environment, Map<String, Entity> entities, String entity, String resultProp, String arg1, String arg2) throws ValidationException {
@@ -92,7 +95,6 @@ public class Validation {
     }
 
     public static boolean isNumeric(String str) {
-        // TODO: check if type is decimal and value is float
         return isDouble(str);
     }
 

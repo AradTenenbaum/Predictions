@@ -1,6 +1,7 @@
 package com.predict.engine.def.action;
 
 import com.predict.engine.def.Function;
+import com.predict.engine.def.Property;
 import com.predict.engine.def.PropertyType;
 import com.predict.engine.def.action.Action;
 import com.predict.engine.def.action.ActionType;
@@ -10,15 +11,15 @@ import com.predict.engine.utils.exception.SimulationException;
 import com.predict.engine.utils.func.Convert;
 
 public class Calculation extends Action {
-    public static enum TYPES {
-        NO_TYPE, MULT, DIV
+    public enum TYPES {
+        MULT, DIV
     }
-    private String resultProp;
+    private Property resultProp;
     private TYPES calcType;
     private String arg1;
     private String arg2;
 
-    public Calculation(String entity, String resultProp, TYPES calcType, String arg1, String arg2) {
+    public Calculation(String entity, Property resultProp, TYPES calcType, String arg1, String arg2) {
         super(ActionType.CALCULATION, entity);
         this.resultProp = resultProp;
         this.calcType = calcType;
@@ -30,7 +31,7 @@ public class Calculation extends Action {
     public void invoke(EntityInstance entityInstance, EnvironmentInstance env) throws SimulationException {
         Object v1 = arg1;
         Object v2 = arg2;
-        String resultPropType = entityInstance.getPropertyType(resultProp);
+        String resultPropType = resultProp.getType();
         if(entityInstance.hasProperty(arg1)) {
             v1 = entityInstance.getPropertyValue(arg1);
         }
@@ -46,14 +47,16 @@ public class Calculation extends Action {
         }
         if(calcType == TYPES.MULT) {
             Double result = Double.parseDouble(v1.toString()) * Double.parseDouble(v2.toString());
-            if(PropertyType.isDecimal(resultPropType)) {
-                entityInstance.setProperty(resultProp,result.intValue());
-            } else {
-                entityInstance.setProperty(resultProp,result);
+            if(resultProp.getRange().on(result)) {
+                if(PropertyType.isDecimal(resultPropType)) {
+                    entityInstance.setProperty(resultProp.getName(),result.intValue());
+                } else {
+                    entityInstance.setProperty(resultProp.getName(),result);
+                }
             }
         } else if (calcType == TYPES.DIV) {
             Double result = Double.valueOf(v1.toString()) / Double.valueOf(v2.toString());
-            entityInstance.setProperty(resultProp, (PropertyType.isDecimal(resultPropType) ? result.intValue() : result));
+            if(resultProp.getRange().on(result)) entityInstance.setProperty(resultProp.getName(), (PropertyType.isDecimal(resultPropType) ? result.intValue() : result));
         } else {
             throw new SimulationException("no such calculation " + calcType);
         }

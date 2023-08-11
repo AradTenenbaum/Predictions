@@ -1,8 +1,9 @@
 package com.predict.engine.utils.object;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class Range {
+public class Range implements Serializable {
     private double from;
     private double to;
 

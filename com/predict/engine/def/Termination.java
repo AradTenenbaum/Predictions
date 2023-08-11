@@ -1,6 +1,8 @@
 package com.predict.engine.def;
 
-public class Termination {
+import java.io.Serializable;
+
+public class Termination implements Serializable {
     public static enum REASONS {
         TICKS, SECONDS
     }

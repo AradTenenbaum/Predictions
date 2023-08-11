@@ -1,6 +1,8 @@
 package com.predict.engine.data.dto;
 
-public class TerminationDto {
+import java.io.Serializable;
+
+public class TerminationDto implements Serializable {
     int seconds;
     int ticks;
 

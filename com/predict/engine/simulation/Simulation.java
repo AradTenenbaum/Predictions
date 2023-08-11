@@ -4,14 +4,15 @@ import com.predict.engine.data.dto.WorldDto;
 import com.predict.engine.def.Termination;
 import com.predict.engine.ins.EntityInstance;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public class Simulation {
-    private static int idGenerator = 1;
-    private int id;
+public class Simulation implements Serializable {
+    private UUID id;
     private Map<String, List<EntityInstance>> entities;
     private Date runDate;
     private WorldDto worldDto;
@@ -19,13 +20,13 @@ public class Simulation {
     private Termination.REASONS terminationReason;
 
     public Simulation(Map<String, List<EntityInstance>> entities, Date runDate, WorldDto worldDto) {
-        this.id = idGenerator++;
+        this.id = UUID.randomUUID();
         this.entities = entities;
         this.runDate = runDate;
         this.worldDto = worldDto;
     }
 
-    public int getId() {
+    public UUID getId() {
         return id;
     }
 

@@ -4,7 +4,9 @@ import com.predict.engine.utils.func.Convert;
 import com.predict.engine.utils.func.RandomGenerator;
 import com.predict.engine.utils.object.Range;
 
-public class Property {
+import java.io.Serializable;
+
+public class Property implements Serializable {
     private String name;
     private Range range;
     private Boolean isRandom;

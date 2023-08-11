@@ -1,6 +1,8 @@
 package com.predict.engine.def;
 
-public class PropertyType {
+import java.io.Serializable;
+
+public class PropertyType implements Serializable {
     public static String DECIMAL = "decimal";
     public static String FLOAT = "float";
     public static String BOOLEAN = "boolean";

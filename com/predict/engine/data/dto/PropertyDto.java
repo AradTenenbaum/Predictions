@@ -2,7 +2,9 @@ package com.predict.engine.data.dto;
 
 import com.predict.engine.utils.object.Range;
 
-public class PropertyDto {
+import java.io.Serializable;
+
+public class PropertyDto implements Serializable {
     private String name;
     private String type;
     private Range range;

@@ -10,7 +10,9 @@ import com.predict.engine.utils.func.Convert;
 import com.predict.engine.utils.func.RandomGenerator;
 import com.predict.engine.utils.object.Range;
 
-public class Action {
+import java.io.Serializable;
+
+public class Action implements Serializable {
     protected String type;
     protected String entity;
     protected Property property;
@@ -50,7 +52,6 @@ public class Action {
     }
 
     public void invoke(EntityInstance entityInstance, EnvironmentInstance env) throws SimulationException {
-        // TODO: handle range check when changing value
         String propType = "";
         Object propValue = "";
         String val = "";

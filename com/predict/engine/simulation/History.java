@@ -1,10 +1,12 @@
 package com.predict.engine.simulation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public class History {
+public class History implements Serializable {
     private List<Simulation> simulations;
 
     public History() {
@@ -19,8 +21,8 @@ public class History {
         return simulations;
     }
 
-    public Simulation getSimulationById(int id) {
-        Optional<Simulation> s = simulations.stream().filter(simulation -> simulation.getId() == id).findFirst();
+    public Simulation getSimulationById(UUID id) {
+        Optional<Simulation> s = simulations.stream().filter(simulation -> simulation.getId().equals(id)).findFirst();
         if(s.isPresent()) return s.get();
         else return null;
     }

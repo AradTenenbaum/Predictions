@@ -1,7 +1,8 @@
 package com.predict.engine.ins;
 
+import java.io.Serializable;
 import java.util.Map;
-public class EntityInstance {
+public class EntityInstance implements Serializable {
     private static int idGenerator = 1;
     private int id;
     private String name;

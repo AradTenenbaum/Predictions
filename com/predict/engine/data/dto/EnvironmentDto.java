@@ -1,8 +1,9 @@
 package com.predict.engine.data.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EnvironmentDto {
+public class EnvironmentDto implements Serializable {
     private List<PropertyDto> properties;
 
     public EnvironmentDto(List<PropertyDto> properties) {

@@ -8,9 +8,10 @@ import com.predict.engine.ins.PropertyInstance;
 import com.predict.engine.ins.environment.EnvironmentInstance;
 import com.predict.engine.utils.exception.SimulationException;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Manager {
+public class Manager implements Serializable {
     private World currentWorld;
     private WorldDto sharedWorld;
     private Boolean isValidWorld;
@@ -45,11 +46,10 @@ public class Manager {
         return history.getSimulations();
     }
 
-    public Simulation getSimulationById(int id) {
+    public Simulation getSimulationById(UUID id) {
         return history.getSimulationById(id);
     }
 
-    // TODO: check if instance passes it's range
     public Simulation runSimulation(EnvironmentInstance env) throws SimulationException, RuntimeException {
         if(currentWorld == null && !isValidWorld) {
             throw new SimulationException("no valid file was loaded. please load a file to run this action");

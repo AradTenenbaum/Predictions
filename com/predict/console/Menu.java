@@ -17,15 +17,12 @@ import com.predict.engine.utils.exception.SimulationException;
 import com.predict.engine.utils.exception.ValidationException;
 import com.predict.engine.utils.func.RandomGenerator;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Menu {
-    // TODO: validate user input
     private Manager manager;
 
     public Menu(Manager manager) {
@@ -42,6 +39,8 @@ public class Menu {
         System.out.println((i++) + ". Display simulation");
         System.out.println((i++) + ". Run a simulation");
         System.out.println((i++) + ". History");
+        System.out.println((i++) + ". Save state of the system to a file");
+        System.out.println((i++) + ". Load system from a file");
         System.out.println((i) + ". exit");
     }
 
@@ -77,6 +76,12 @@ public class Menu {
         } else if(choice == 5) {
             System.out.println("Thank you and Goodbye!");
             System.exit(0);
+        } else if (choice == 6) {
+            saveManagerToFile();
+        } else if (choice == 7) {
+            loadManagerFromFile();
+        } else {
+            System.out.println("Not a valid choice, please try again");
         }
     }
 
@@ -96,18 +101,19 @@ public class Menu {
 
     private void historyMenu() {
         Scanner scanner = new Scanner(System.in);
-        int chosenSimulationId = 1;
-        while (chosenSimulationId != 0) {
+        int chosenSimulationNo = 1;
+        while (chosenSimulationNo != 0) {
             System.out.println("Simulation History:");
             System.out.println("----------------------");
+            AtomicInteger k = new AtomicInteger(1);
             manager.getSimulationsHistory().forEach(simulation -> {
-                System.out.println("Date: " + simulation.getFormattedRunDate() + " Simulation: " + simulation.getId());
+                System.out.println((k.getAndIncrement()) + " Date: " + simulation.getFormattedRunDate() + " Simulation: " + simulation.getId());
                 System.out.println("----------------------");
             });
             System.out.print("Choose a number of simulation to display or 0 to go back: ");
-            chosenSimulationId = scanner.nextInt();
-            if(chosenSimulationId != 0) {
-                Simulation chosenSimulation = manager.getSimulationById(chosenSimulationId);
+            chosenSimulationNo = scanner.nextInt();
+            if(chosenSimulationNo > 0 &&  chosenSimulationNo <= manager.getSimulationsHistory().size()) {
+                Simulation chosenSimulation = manager.getSimulationById(manager.getSimulationsHistory().get(chosenSimulationNo-1).getId());
                 if(chosenSimulation == null) System.out.println("No such simulation, please pick an existing simulation");
                 else {
                     int simulationDisplayChoice = 1;
@@ -132,31 +138,33 @@ public class Menu {
                                 entity.ifPresent(entityDto -> System.out.println("Entity: " + s + " amount before run: " + entityDto.getPopulation() + " amount after run: " + aliveAmount));
                             });
                         } else if (simulationDisplayChoice == 2) {
-                            // TODO: The property group by value
                             System.out.println("Choose Entity:");
                             AtomicInteger i = new AtomicInteger();
+                            List<String> entitiesIndexed = new ArrayList<>();
                             chosenSimulation.getEntities().forEach((s, entityInstances) -> {
                                 System.out.println((i.incrementAndGet()) + ". " + s);
+                                entitiesIndexed.add(s);
                             });
 
-                            scanner.nextLine();
-                            System.out.print("entity: ");
-                            String entityChosen = scanner.nextLine();
+                            System.out.print("entity no: ");
+                            int entityChosen = scanner.nextInt();
 
-                            if(chosenSimulation.getEntities().containsKey(entityChosen)) {
-                                List<EntityInstance> entityInstances = chosenSimulation.getEntities().get(entityChosen);
+                            if(entityChosen <= entitiesIndexed.size()) {
+                                List<EntityInstance> entityInstances = chosenSimulation.getEntities().get(entitiesIndexed.get(entityChosen-1));
                                 System.out.println("Choose Property:");
                                 AtomicInteger j = new AtomicInteger();
+                                List<String> propertiesIndexed = new ArrayList<>();
                                 entityInstances.get(0).getProperties().forEach((s, propertyInstance) -> {
                                     System.out.println(j.incrementAndGet() + ". " + s);
+                                    propertiesIndexed.add(s);
                                 });
-                                System.out.print("property: ");
-                                String propertyChosen = scanner.nextLine();
-                                if(entityInstances.get(0).hasProperty(propertyChosen)) {
+                                System.out.print("property no: ");
+                                int propertyChosen = scanner.nextInt();
+                                if(propertyChosen <= propertiesIndexed.size()) {
                                     Map<Object, List<EntityInstance>> entitiesByProperty = entityInstances.stream()
-                                            .collect(Collectors.groupingBy(entityInstance -> entityInstance.getPropertyValue(propertyChosen)));
+                                            .collect(Collectors.groupingBy(entityInstance -> entityInstance.getPropertyValue(propertiesIndexed.get(propertyChosen-1))));
                                     entitiesByProperty.forEach((value, entities) -> {
-                                        System.out.println(propertyChosen + ": " + value + " amount: " + entities.stream().filter(EntityInstance::getAlive).count());
+                                        System.out.println(propertiesIndexed.get(propertyChosen-1) + ": " + value + " amount: " + entities.stream().filter(EntityInstance::getAlive).count());
                                     });
                                 } else {
                                     System.out.println("Property does not exists");
@@ -168,6 +176,8 @@ public class Menu {
                     }
 
                 }
+            } else {
+                System.out.println("Invalid simulation was chosen");
             }
         }
     }
@@ -247,5 +257,33 @@ public class Menu {
         envInstance.getProperties().forEach((s, propertyInstance) -> System.out.println(s + "=" + propertyInstance.getValue()));
 
         return envInstance;
+    }
+
+    public void saveManagerToFile() {
+        String filePath = "C:\\Users\\aradt\\Downloads\\manager.dat";
+
+        try (FileOutputStream fileOut = new FileOutputStream(filePath);
+             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut)) {
+
+            objectOut.writeObject(manager);
+
+            System.out.println("Manager object saved to " + filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadManagerFromFile() {
+        String filePath = "C:\\Users\\aradt\\Downloads\\manager.dat";
+
+        try (FileInputStream fileIn = new FileInputStream(filePath);
+             ObjectInputStream objectIn = new ObjectInputStream(fileIn)) {
+
+            this.manager = (Manager) objectIn.readObject();
+
+            System.out.println("Loaded Manager object");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
