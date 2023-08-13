@@ -54,7 +54,7 @@ public class File {
             manager.setCurrentWorld(world);
             manager.setSharedWorld(sharedWorld);
             manager.setValidWorld(true);
-            System.out.println("File was loaded successfully");
+
 
         } catch (JAXBException e) {
             throw new ValidationException("File might not match scheme");
@@ -243,6 +243,10 @@ public class File {
         try {
             Validation.stringNoSpaceValidation(trimmedName);
 
+            if(fileEntity.getPRDPopulation() < 0) {
+                throw new ValidationException("Population cannot be negative");
+            }
+
             Entity entity = new Entity(trimmedName, fileEntity.getPRDPopulation());
             for(PRDProperty fileProp : fileEntity.getPRDProperties().getPRDProperty()) {
                 Property p;
@@ -263,6 +267,7 @@ public class File {
         String trimmedName = name.trim();
         try {
             Validation.stringNoSpaceValidation(trimmedName);
+            if(range != null) Validation.rangeValid(range.getFrom(), range.getTo());
         } catch (ValidationException e) {
             throw new ValidationException("Property: " + name + " -> " + e.getMessage());
         }

@@ -73,12 +73,12 @@ public class Menu {
             }
         } else if (choice == 4) {
             historyMenu();
-        } else if(choice == 5) {
+        } else if(choice == 7) {
             System.out.println("Thank you and Goodbye!");
             System.exit(0);
-        } else if (choice == 6) {
+        } else if (choice == 5) {
             saveManagerToFile();
-        } else if (choice == 7) {
+        } else if (choice == 6) {
             loadManagerFromFile();
         } else {
             System.out.println("Not a valid choice, please try again");
@@ -92,6 +92,7 @@ public class Menu {
         try {
             // test files is in "com/predict/resources/ex1-cigarets.xml" and "com/predict/resources/master-ex1.xml"
             File.fetchDataFromFile(path, manager);
+            System.out.println("File was loaded successfully");
         } catch (ValidationException | FileException e) {
             System.out.println(e.getMessage());
         } catch (Exception e) {
@@ -260,30 +261,38 @@ public class Menu {
     }
 
     public void saveManagerToFile() {
-        String filePath = "C:\\Users\\aradt\\Downloads\\manager.dat";
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Insert file path: ");
+        String filePath = scanner.nextLine();
+        filePath += ".dat";
+//        String filePath = "C:\\Users\\aradt\\Downloads\\manager.dat";
 
         try (FileOutputStream fileOut = new FileOutputStream(filePath);
              ObjectOutputStream objectOut = new ObjectOutputStream(fileOut)) {
 
             objectOut.writeObject(manager);
 
-            System.out.println("Manager object saved to " + filePath);
+            System.out.println("System data was saved to " + filePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Problem with the file, try again with a different path");
         }
     }
 
     public void loadManagerFromFile() {
-        String filePath = "C:\\Users\\aradt\\Downloads\\manager.dat";
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Insert file path: ");
+        String filePath = scanner.nextLine();
+        filePath += ".dat";
+//        String filePath = "C:\\Users\\aradt\\Downloads\\manager.dat";
 
         try (FileInputStream fileIn = new FileInputStream(filePath);
              ObjectInputStream objectIn = new ObjectInputStream(fileIn)) {
 
             this.manager = (Manager) objectIn.readObject();
 
-            System.out.println("Loaded Manager object");
+            System.out.println("Loaded system data");
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Problem with the file, try again with a different path");
         }
     }
 }

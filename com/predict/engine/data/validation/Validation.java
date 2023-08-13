@@ -9,6 +9,8 @@ import com.predict.engine.utils.exception.ValidationException;
 import java.util.Map;
 
 public class Validation {
+
+    // TODO: approve decimal to float casting
     public static void isTypeValid(Environment environment, Map<String, Entity> entities, String entity, String property, String value) throws ValidationException {
         String type = entities.get(entity).getProperties().get(property).getType();
         String func = Function.whichFunction(value);
@@ -92,6 +94,10 @@ public class Validation {
 
     public static void stringNoSpaceValidation(String s) throws ValidationException {
         if(s.contains(" ")) throw new ValidationException(s + " contains spaces and it is not allowed");
+    }
+
+    public static void rangeValid(double from, double to) throws ValidationException {
+        if(from > to) throw new ValidationException("Range is not valid");
     }
 
     public static boolean isNumeric(String str) {
