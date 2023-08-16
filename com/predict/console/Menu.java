@@ -162,8 +162,9 @@ public class Menu {
                                 System.out.print("property no: ");
                                 int propertyChosen = scanner.nextInt();
                                 if(propertyChosen <= propertiesIndexed.size()) {
-                                    Map<Object, List<EntityInstance>> entitiesByProperty = entityInstances.stream()
+                                    Map<Object, List<EntityInstance>> entitiesByProperty = entityInstances.stream().filter(EntityInstance::getAlive)
                                             .collect(Collectors.groupingBy(entityInstance -> entityInstance.getPropertyValue(propertiesIndexed.get(propertyChosen-1))));
+                                    if(entitiesByProperty.isEmpty()) System.out.println("All entities of this type are not alive");
                                     entitiesByProperty.forEach((value, entities) -> {
                                         System.out.println(propertiesIndexed.get(propertyChosen-1) + ": " + value + " amount: " + entities.stream().filter(EntityInstance::getAlive).count());
                                     });
@@ -177,7 +178,7 @@ public class Menu {
                     }
 
                 }
-            } else {
+            } else if(chosenSimulationNo != 0) {
                 System.out.println("Invalid simulation was chosen");
             }
         }

@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class Validation {
 
-    // TODO: approve decimal to float casting
     public static void isTypeValid(Environment environment, Map<String, Entity> entities, String entity, String property, String value) throws ValidationException {
         String type = entities.get(entity).getProperties().get(property).getType();
         String func = Function.whichFunction(value);
@@ -18,7 +17,9 @@ public class Validation {
             if(func.equals(Function.ENVIRONMENT)) {
                 String envVar = Function.getEnvVarName(value);
                 if(!environment.getProperties().get(envVar).getType().equals(type)) {
-                    throw new ValidationException("'" + property + "' from '"+entity+"' is of type '"+type+"' but '"+envVar+"' is of type '"+environment.getProperties().get(envVar).getType()+"'");
+                    if(!(PropertyType.isDecimal(environment.getProperties().get(envVar).getType()) && PropertyType.isFloat(type))) {
+                        throw new ValidationException("'" + property + "' from '"+entity+"' is of type '"+type+"' but '"+envVar+"' is of type '"+environment.getProperties().get(envVar).getType()+"'");
+                    }
                 }
             }
             else if(func.equals(Function.RANDOM)) {
