@@ -3,12 +3,16 @@ package def.action;
 import def.Function;
 import def.Property;
 import def.PropertyType;
+import def.World;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
 import utils.exception.SimulationException;
 import utils.func.Convert;
+import utils.object.Grid;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 public class Action implements Serializable {
     protected String type;
@@ -49,7 +53,7 @@ public class Action implements Serializable {
         return property;
     }
 
-    public void invoke(EntityInstance entityInstance, EnvironmentInstance env) throws SimulationException {
+    public void invoke(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid) throws SimulationException {
         String propType = "";
         Object propValue = "";
         String val = "";

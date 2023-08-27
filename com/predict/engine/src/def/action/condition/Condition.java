@@ -1,13 +1,16 @@
 package def.action.condition;
 
 import def.Property;
+import def.World;
 import def.action.Action;
 import def.action.ActionType;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
 import utils.exception.SimulationException;
+import utils.object.Grid;
 
 import java.util.List;
+import java.util.Map;
 
 public class Condition extends Action {
     protected List<Action> thenActions;
@@ -35,11 +38,11 @@ public class Condition extends Action {
     }
 
     @Override
-    public void invoke(EntityInstance entityInstance, EnvironmentInstance env) throws SimulationException {
+    public void invoke(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid) throws SimulationException {
         if(isTrue(entityInstance, env)) {
             thenActions.forEach(action -> {
                 try {
-                    action.invoke(entityInstance, env);
+                    action.invoke(entityInstance, env, entities, world, grid);
                 } catch (SimulationException e) {
                     throw new RuntimeException(e);
                 }
@@ -49,7 +52,7 @@ public class Condition extends Action {
             if(elseActions != null) {
                 elseActions.forEach(action -> {
                     try {
-                        action.invoke(entityInstance, env);
+                        action.invoke(entityInstance, env, entities, world, grid);
                     } catch (SimulationException e) {
                         throw new RuntimeException(e);
                     }

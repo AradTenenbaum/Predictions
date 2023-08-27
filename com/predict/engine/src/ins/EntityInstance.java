@@ -23,6 +23,10 @@ public class EntityInstance implements Serializable {
         this.position = position;
     }
 
+    public Position getPosition() {
+        return position;
+    }
+
     public void move(Grid simulationGrid) {
         Position newPos = simulationGrid.moveToFreePosition(position);
         setPosition(newPos);

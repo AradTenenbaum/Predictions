@@ -3,10 +3,15 @@ package def.action;
 import def.Function;
 import def.Property;
 import def.PropertyType;
+import def.World;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
 import utils.exception.SimulationException;
 import utils.func.Convert;
+import utils.object.Grid;
+
+import java.util.List;
+import java.util.Map;
 
 public class Calculation extends Action {
     public enum TYPES {
@@ -26,7 +31,7 @@ public class Calculation extends Action {
     }
 
     @Override
-    public void invoke(EntityInstance entityInstance, EnvironmentInstance env) throws SimulationException {
+    public void invoke(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid) throws SimulationException {
         Object v1 = arg1;
         Object v2 = arg2;
         String resultPropType = resultProp.getType();

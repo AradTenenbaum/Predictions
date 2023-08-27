@@ -45,10 +45,17 @@ public class Grid {
         return newGrid;
     }
 
+    public void removeFromPos(Position pos) {
+        board[pos.getX()][pos.getY()] = 0;
+    }
+
     private Position addOnRandom(int value) {
         int leftPlaces = (rows*columns) - elementsAmount;
+        System.out.println("Left places: " + leftPlaces);
         if(leftPlaces > 0) {
             int randomLocation = (RandomGenerator.getInt(new Range(0, leftPlaces-1)));
+            System.out.println("Random place: " + randomLocation);
+
             for(int i = 0; (i < rows); i++) {
                 for(int j = 0; (j < columns); j++) {
                     if(board[i][j] == 0) {
@@ -64,11 +71,16 @@ public class Grid {
                 }
             }
         }
+        System.out.println("Could not find");
         printGrid();
         return null;
     }
 
-    private int getPos(Position p) {
+    public void setPos(Position pos, int value) {
+        this.board[pos.getX()][pos.getY()] = value;
+    }
+
+    public int getPos(Position p) {
         return this.board[p.getX()][p.getY()];
     }
 

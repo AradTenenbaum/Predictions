@@ -87,7 +87,7 @@ public class Manager implements Serializable {
                     rule.getActions().forEach(action -> {
                         entities.get(action.getEntity()).stream().filter(EntityInstance::getAlive).forEach(entityInstance -> {
                             try {
-                                action.invoke(entityInstance, env);
+                                if(entityInstance.getAlive()) action.invoke(entityInstance, env, entities, currentWorld, grid);
                             } catch (SimulationException e) {
                                 throw new RuntimeException(action.getEntity() + " -> " + rule.getName() + " -> " + e.getMessage());
                             }
@@ -99,7 +99,10 @@ public class Manager implements Serializable {
             // move all entities
             entities.forEach(((s, entityInstances) -> {
                 entityInstances.forEach(entityInstance -> {
-                    entityInstance.move(grid);
+                    if(entityInstance.getAlive()) entityInstance.move(grid);
+                    else {
+                        if(grid.getPos(entityInstance.getPosition()) == entityInstance.getId()) grid.removeFromPos(entityInstance.getPosition());
+                    }
                 });
             }));
             grid.printGrid();
@@ -114,7 +117,7 @@ public class Manager implements Serializable {
 //        }));
         // Testing simulation
 
-        Simulation s = new Simulation(entities, new Date(), sharedWorld);
+        Simulation s = new Simulation(entities, sharedWorld);
 
         if(!(ticks < currentWorld.getTermination().getTicks())) {
             s.setTerminationReason(Termination.REASONS.TICKS);

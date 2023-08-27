@@ -4,15 +4,14 @@ import data.dto.WorldDto;
 import data.jaxb.*;
 import data.validation.Validation;
 import def.*;
-import def.action.Action;
-import def.action.ActionType;
-import def.action.Calculation;
+import def.action.*;
 import def.action.condition.Condition;
 import def.action.condition.MultipleCondition;
 import def.action.condition.SingleCondition;
 import simulation.Manager;
 import utils.exception.FileException;
 import utils.exception.ValidationException;
+import utils.func.Convert;
 import utils.object.Grid;
 import utils.object.Range;
 
@@ -205,8 +204,16 @@ public class File {
         else if(fileAction.getType().equals(ActionType.KILL)) {
             Validation.isEntityExists(entities, fileAction.getEntity());
             return new Action(fileAction.getType(), fileAction.getEntity());
-        }
-        else {
+        } else if (fileAction.getType().equals(ActionType.PROXIMITY)) {
+            Validation.isEntityExists(entities, fileAction.getPRDBetween().getSourceEntity());
+            Validation.isEntityExists(entities, fileAction.getPRDBetween().getTargetEntity());
+            List<Action> actions = buildActions(fileAction.getPRDActions());
+            return new Proximity(fileAction.getPRDBetween().getSourceEntity(), fileAction.getPRDBetween().getTargetEntity(), Convert.stringToInteger(fileAction.getPRDEnvDepth().getOf()), actions);
+        } else if (fileAction.getType().equals(ActionType.REPLACE)) {
+            Validation.isEntityExists(entities, fileAction.getKill());
+            Validation.isEntityExists(entities, fileAction.getCreate());
+            return new Replace(fileAction.getKill(), fileAction.getCreate(), fileAction.getMode());
+        } else {
             throw new ValidationException("'" + fileAction.getType() +"' is not a valid action type");
         }
     }

@@ -7,4 +7,6 @@ public class ActionType {
     public static String CONDITION = "condition";
     public static String SET = "set";
     public static String KILL = "kill";
+    public static String PROXIMITY = "proximity";
+    public static String REPLACE = "replace";
 }

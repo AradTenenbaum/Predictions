@@ -69,6 +69,18 @@
 				</PRD-action>
 			</PRD-actions>
 			<PRD-activation ticks="1" probability="0.4"/>
+		</PRD-rule>	
+		<PRD-rule name="r3">
+			<PRD-actions>
+				<PRD-action type="proximity">
+					<PRD-between source-entity="ent-1" target-entity="ent-2"/>
+					<PRD-env-depth of="2"/>
+					<PRD-actions>
+						<PRD-action type="increase" entity="ent-1" property="p1" by="3"/>
+						<PRD-action type="decrease" entity="ent-1" property="p2" by="environment(e3)"/>
+					</PRD-actions>					
+				</PRD-action>
+			</PRD-actions>
 		</PRD-rule>
 	</PRD-rules>
 	<PRD-termination>

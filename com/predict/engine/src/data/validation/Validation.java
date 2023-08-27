@@ -143,8 +143,10 @@ public class Validation {
         String func = Function.whichFunction(property);
         String propertyFixedValue = property;
         if(func != null) {
+            String content = Function.getFunctionContent(propertyFixedValue);
             if(func.equals(Function.TICKS)) {
-                propertyFixedValue = Function.getFunctionContent(property).split(".")[1];
+                String propAndEnt[] = content.split("\\.");
+                propertyFixedValue = propAndEnt[1];
             }
         }
         if(!entities.containsKey(entity)) throw new ValidationException("no such entity '" + entity + "'");

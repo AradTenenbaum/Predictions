@@ -20,10 +20,10 @@ public class Simulation implements Serializable {
     private Termination.REASONS terminationReason;
     private Grid grid;
 
-    public Simulation(Map<String, List<EntityInstance>> entities, Date runDate, WorldDto worldDto) {
+    public Simulation(Map<String, List<EntityInstance>> entities, WorldDto worldDto) {
         this.id = UUID.randomUUID();
         this.entities = entities;
-        this.runDate = runDate;
+        this.runDate = new Date();
         this.worldDto = worldDto;
     }
 
