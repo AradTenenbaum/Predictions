@@ -6,6 +6,7 @@ import def.PropertyType;
 import def.action.Action;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
+import utils.exception.SimulationException;
 import utils.func.Convert;
 
 import java.util.List;
@@ -25,18 +26,18 @@ public class SingleCondition extends Condition {
     }
 
     @Override
-    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env) {
-        String val = Function.getFuncInput(value, property.getType(), env);
-        Object propValue;
+    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env) throws SimulationException {
+        String val = Function.getFuncInput(value, property.getType(), env, null);
+        Object propValue = Function.getPropertyIfFunction(property.getName(), entityInstance);
 
         switch (operator) {
             case BT:
                 if(PropertyType.isTypeNumber(property.getType())) {
                     if(property.getType().equals(PropertyType.DECIMAL)) {
-                        Integer number = (Integer) entityInstance.getPropertyValue(property.getName());
+                        Integer number = (Integer) propValue;
                         return number > Convert.stringToInteger(val);
                     } else if (entityInstance.getPropertyType(property.getName()).equals(PropertyType.FLOAT)) {
-                        Double number = (Double) entityInstance.getPropertyValue(property.getName());
+                        Double number = (Double) propValue;
                         return number > Convert.stringToDouble(val);
                     }
                 }
@@ -44,19 +45,19 @@ public class SingleCondition extends Condition {
             case LT:
                 if(PropertyType.isTypeNumber(property.getType())) {
                     if(property.getType().equals(PropertyType.DECIMAL)) {
-                        Integer number = (Integer) entityInstance.getPropertyValue(property.getName());
+                        Integer number = (Integer) propValue;
                         return number < Convert.stringToInteger(val);
                     } else if (property.getType().equals(PropertyType.FLOAT)) {
-                        Double number = (Double) entityInstance.getPropertyValue(property.getName());
+                        Double number = (Double) propValue;
                         return number < Convert.stringToDouble(val);
                     }
                 }
                 break;
             case EQUALS:
-                propValue = entityInstance.getPropertyValue(property.getName());
+                propValue = propValue;
                 return ("" + propValue).equals(val);
             case NOT:
-                propValue = entityInstance.getPropertyValue(property.getName());
+                propValue = propValue;
                 return !("" + propValue).equals(val);
             default:
                 break;

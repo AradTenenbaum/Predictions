@@ -4,6 +4,7 @@ import def.Property;
 import def.action.Action;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
+import utils.exception.SimulationException;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class MultipleCondition extends Condition {
     }
 
     @Override
-    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env) {
+    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env)throws SimulationException {
         if(logical.equals(AND)) {
             for(Condition c : conditions) {
                 if(!c.isTrue(entityInstance, env)) return false;

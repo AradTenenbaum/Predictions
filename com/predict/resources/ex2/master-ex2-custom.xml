@@ -17,7 +17,7 @@
 			<PRD-name>e4</PRD-name>
 		</PRD-env-property>
 	</PRD-environment>
-	<PRD-grid rows="10" columns="10"/>
+	<PRD-grid rows="10" columns="20"/>
 	<PRD-entities>
 		<PRD-entity name="ent-1">
 			<PRD-properties>
@@ -74,10 +74,9 @@
 			<PRD-actions>
 				<PRD-action type="proximity">
 					<PRD-between source-entity="ent-1" target-entity="ent-2"/>
-					<PRD-env-depth of="2"/>
+					<PRD-env-depth of="1"/>
 					<PRD-actions>
-						<PRD-action type="increase" entity="ent-1" property="p1" by="3"/>
-						<PRD-action type="decrease" entity="ent-1" property="p2" by="environment(e3)"/>
+						<PRD-action type="replace" kill="ent-1" create="ent-2" mode="derived"/>
 					</PRD-actions>					
 				</PRD-action>
 			</PRD-actions>

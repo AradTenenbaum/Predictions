@@ -6,6 +6,7 @@ import def.action.Action;
 import def.action.ActionType;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
+import simulation.InvokeKit;
 import utils.exception.SimulationException;
 import utils.object.Grid;
 
@@ -32,17 +33,19 @@ public class Condition extends Action {
         super();
     }
 
-    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env) {
-
-        return true;
+    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env)throws SimulationException {
+        return null;
     }
 
     @Override
-    public void invoke(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid) throws SimulationException {
+    public void invoke(InvokeKit invokeKit) throws SimulationException {
+        EntityInstance entityInstance = invokeKit.getEntityInstance();
+        EnvironmentInstance env = invokeKit.getEnv();
+
         if(isTrue(entityInstance, env)) {
             thenActions.forEach(action -> {
                 try {
-                    action.invoke(entityInstance, env, entities, world, grid);
+                    action.invoke(invokeKit);
                 } catch (SimulationException e) {
                     throw new RuntimeException(e);
                 }
@@ -52,7 +55,7 @@ public class Condition extends Action {
             if(elseActions != null) {
                 elseActions.forEach(action -> {
                     try {
-                        action.invoke(entityInstance, env, entities, world, grid);
+                        action.invoke(invokeKit);
                     } catch (SimulationException e) {
                         throw new RuntimeException(e);
                     }

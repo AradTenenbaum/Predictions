@@ -4,6 +4,7 @@ import def.World;
 import ins.EntityInstance;
 import ins.PropertyInstance;
 import ins.environment.EnvironmentInstance;
+import simulation.InvokeKit;
 import utils.exception.SimulationException;
 import utils.object.Grid;
 
@@ -24,7 +25,12 @@ public class Replace extends Action {
     }
 
     @Override
-    public void invoke(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid) throws SimulationException {
+    public void invoke(InvokeKit invokeKit) throws SimulationException {
+        EntityInstance entityInstance = invokeKit.getEntityInstance();
+        World world = invokeKit.getWorld();
+        Grid grid = invokeKit.getGrid();
+        List<EntityInstance> toCreate = invokeKit.getToCreate();
+
         entityInstance.kill();
         Map<String, PropertyInstance> properties = new HashMap<>();
         if(mode.equals(SCRATCH)) {
@@ -33,7 +39,7 @@ public class Replace extends Action {
             });
         } else if(mode.equals(DERIVED)) {
             world.getEntities().get(createEntity).getProperties().forEach((propertyName, property) -> {
-                if(entityInstance.hasProperty(propertyName)) {
+                if(entityInstance.hasProperty(propertyName) && entityInstance.getPropertyType(propertyName).equals(world.getEntities().get(createEntity).getProperties().get(propertyName).getType())) {
                     properties.put(propertyName, entityInstance.getProperties().get(propertyName));
                 }
                 else {
@@ -45,7 +51,6 @@ public class Replace extends Action {
         newEntIns.setPosition(entityInstance.getPosition());
         // update the grid as well
         grid.setPos(entityInstance.getPosition(), newEntIns.getId());
-        entities.get(createEntity).add(newEntIns);
-        System.out.println(entityInstance.getId() + " was replaced by " + newEntIns.getId() + " value in pos: " + grid.getPos(entityInstance.getPosition()));
+        toCreate.add(newEntIns);
     }
 }

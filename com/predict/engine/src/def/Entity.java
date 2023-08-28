@@ -31,6 +31,10 @@ public class Entity implements Serializable {
         return population;
     }
 
+    public void setPopulation(int population) {
+        this.population = population;
+    }
+
     @Override
     public String toString() {
         return "Entity{" +

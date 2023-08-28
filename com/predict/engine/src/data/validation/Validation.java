@@ -25,19 +25,7 @@ public class Validation {
         }
         String func = Function.whichFunction(value);
         if(func != null) {
-            if(func.equals(Function.ENVIRONMENT)) {
-                String envVar = Function.getFunctionContent(value);
-                if(!environment.getProperties().get(envVar).getType().equals(type)) {
-                    if(!(PropertyType.isDecimal(environment.getProperties().get(envVar).getType()) && PropertyType.isFloat(type))) {
-                        throw new ValidationException("'" + property + "' from '"+entity+"' is of type '"+type+"' but '"+envVar+"' is of type '"+environment.getProperties().get(envVar).getType()+"'");
-                    }
-                }
-            }
-            else if(func.equals(Function.RANDOM)) {
-                if(!type.equals(PropertyType.DECIMAL) && !PropertyType.isFloat(type)) {
-                    throw new ValidationException("'" + property+"' from '"+entity+"' is of type '"+type+"' so cannot receive random int");
-                }
-            }
+            isValidFunction(entities, func, environment, value, type, property, entity);
         }
         else {
             try {
@@ -48,10 +36,59 @@ public class Validation {
         }
     }
 
+    public static  void isValidFunction(Map<String, Entity> entities, String func, Environment environment, String value, String type, String property, String entity) throws ValidationException {
+        if(func.equals(Function.ENVIRONMENT)) {
+            String envVar = Function.getFunctionContent(value);
+            if(!environment.getProperties().get(envVar).getType().equals(type)) {
+                if(!(PropertyType.isDecimal(environment.getProperties().get(envVar).getType()) && PropertyType.isFloat(type))) {
+                    throw new ValidationException("'" + property + "' from '"+entity+"' is of type '"+type+"' but '"+envVar+"' is of type '"+environment.getProperties().get(envVar).getType()+"'");
+                }
+            }
+        }
+        else if(func.equals(Function.RANDOM)) {
+            if(!type.equals(PropertyType.DECIMAL) && !PropertyType.isFloat(type)) {
+                throw new ValidationException("'" + property+"' from '"+entity+"' is of type '"+type+"' so cannot receive random int");
+            }
+        } else if (func.equals(Function.EVALUATE)) {
+            String funcArgs[] = Function.getFunctionContent(value).split("\\.");
+            if(funcArgs.length != 2) throw new ValidationException("'" + value + "' is not a valid value");
+            if(!type.equals(entities.get(funcArgs[0]).getProperties().get(funcArgs[1]).getType())) {
+                throw new ValidationException("'" + value + "' is not a valid type for " + type);
+            }
+        } else if (func.equals(Function.PERCENT)) {
+            if(!type.equals(PropertyType.DECIMAL) && !type.equals(PropertyType.FLOAT)) throw new ValidationException("cannot put percent in " + type);
+            String funcArgs[] = Function.getFunctionContent(value).split(",");
+            if(funcArgs.length != 2) throw new ValidationException("'" + value + "' is not a valid value");
+            // TODO: handle a case there is a function inside it
+            String insideFunc1 = Function.whichFunction(funcArgs[0]);
+            if(insideFunc1 != null) isValidFunction(entities, insideFunc1, environment, funcArgs[0], PropertyType.FLOAT, property, entity);
+            else if(!isNumeric(funcArgs[0])) {
+                throw new ValidationException(value + " contains not numeric elements");
+            }
+            String insideFunc2 = Function.whichFunction(funcArgs[1]);
+            if(insideFunc2 != null)  isValidFunction(entities, insideFunc2, environment, funcArgs[1], PropertyType.FLOAT, property, entity);
+            else if(!isNumeric(funcArgs[1])) {
+                throw new ValidationException(value + " contains not numeric elements");
+            }
+        }
+    }
+
     public static void isValidByRange(String value, double from, double to) throws ValidationException {
         if(!isNumeric(value)) throw new ValidationException("'" + value + "' is not a number");
         Double number = Double.parseDouble(value);
         if(number > to || number < from) throw new ValidationException("'" + value + "' is not in the range: " + from + "-" + to);
+    }
+
+    public static void ifEnvIsValid(Environment env, String value) throws ValidationException {
+        String func = Function.whichFunction(value);
+        if(func != null) {
+            if(func.equals(Function.ENVIRONMENT)) {
+                String arg = Function.getFunctionContent(value);
+                if(!env.getProperties().containsKey(arg)) {
+                    throw new ValidationException("No such env variable " + arg);
+                }
+            }
+        }
     }
 
     public static void isValueFromType(String type, String value) throws ValidationException {

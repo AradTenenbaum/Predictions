@@ -23,6 +23,14 @@ public class Manager implements Serializable {
         this.history = new History();
     }
 
+    public void setPopulations(Map<String, Integer> populations) {
+        currentWorld.getEntities().forEach((s, entity) -> {
+            if(populations.containsKey(s)) {
+                entity.setPopulation(populations.get(s));
+            }
+        });
+    }
+
     public void setCurrentWorld(World currentWorld) {
         this.currentWorld = currentWorld;
     }
@@ -76,18 +84,21 @@ public class Manager implements Serializable {
         // Create the grid
         Grid grid = currentWorld.getGrid().generateGrid(entities);
 
+        List<EntityInstance> toCreate = new ArrayList<>();
+
         int ticks = 0;
         long startTime = System.currentTimeMillis();
         long duration = 1000L *currentWorld.getTermination().getSeconds();
         while (ticks < currentWorld.getTermination().getTicks() && (System.currentTimeMillis() - startTime < duration)) {
-            int finalTicks = ticks;
 
+            int finalTicks = ticks;
+            // TODO: check if the condition action needs to work without entity
             currentWorld.getRules().forEach(rule -> {
                 if(rule.isActive(finalTicks)) {
                     rule.getActions().forEach(action -> {
                         entities.get(action.getEntity()).stream().filter(EntityInstance::getAlive).forEach(entityInstance -> {
                             try {
-                                if(entityInstance.getAlive()) action.invoke(entityInstance, env, entities, currentWorld, grid);
+                                if(entityInstance.getAlive()) action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks));
                             } catch (SimulationException e) {
                                 throw new RuntimeException(action.getEntity() + " -> " + rule.getName() + " -> " + e.getMessage());
                             }
@@ -95,6 +106,11 @@ public class Manager implements Serializable {
                     });
                 }
             });
+
+            toCreate.forEach(entityInstance -> {
+                entities.get(entityInstance.getName()).add(entityInstance);
+            });
+            toCreate.clear();
 
             // move all entities
             entities.forEach(((s, entityInstances) -> {
@@ -105,16 +121,16 @@ public class Manager implements Serializable {
                     }
                 });
             }));
-            grid.printGrid();
             ticks++;
         }
 
         // Testing simulation
-//        entities.forEach(((s, entityInstances) -> {
-//            entityInstances.forEach(entityInstance -> {
-//                System.out.println(entityInstance.toString());
-//            });
-//        }));
+        entities.forEach(((s, entityInstances) -> {
+            System.out.println(s + ": " + entityInstances.stream().filter(EntityInstance::getAlive).count());
+            entityInstances.forEach(entityInstance -> {
+                System.out.println(entityInstance.toString());
+            });
+        }));
         // Testing simulation
 
         Simulation s = new Simulation(entities, sharedWorld);

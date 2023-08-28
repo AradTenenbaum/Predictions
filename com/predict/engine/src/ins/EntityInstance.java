@@ -27,6 +27,10 @@ public class EntityInstance implements Serializable {
         return position;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void move(Grid simulationGrid) {
         Position newPos = simulationGrid.moveToFreePosition(position);
         setPosition(newPos);
@@ -35,6 +39,11 @@ public class EntityInstance implements Serializable {
     public void setProperty(String property, Object value) {
         String type = properties.get(property).getType();
         properties.put(property, new PropertyInstance(type, value));
+    }
+
+    public void setProperty(String property, Object value, int lastChangedTick) {
+        String type = properties.get(property).getType();
+        properties.put(property, new PropertyInstance(type, value, lastChangedTick));
     }
 
     public Object getPropertyValue(String property) {

@@ -51,10 +51,8 @@ public class Grid {
 
     private Position addOnRandom(int value) {
         int leftPlaces = (rows*columns) - elementsAmount;
-        System.out.println("Left places: " + leftPlaces);
         if(leftPlaces > 0) {
             int randomLocation = (RandomGenerator.getInt(new Range(0, leftPlaces-1)));
-            System.out.println("Random place: " + randomLocation);
 
             for(int i = 0; (i < rows); i++) {
                 for(int j = 0; (j < columns); j++) {
@@ -62,8 +60,6 @@ public class Grid {
                         if(randomLocation == 0) {
                             board[i][j] = value;
                             this.elementsAmount++;
-                            System.out.println("Adding " + value);
-                            printGrid();
                             return new Position(i, j);
                         }
                         randomLocation--;
@@ -71,7 +67,6 @@ public class Grid {
                 }
             }
         }
-        System.out.println("Could not find");
         printGrid();
         return null;
     }

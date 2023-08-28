@@ -103,8 +103,8 @@ public class File {
             if(fileTerm.getClass().toString().equals("class data.jaxb.PRDBySecond"))
                 fileSeconds = (PRDBySecond)(fileTerm);
         }
-        int ticks = (fileTicks != null ? fileTicks.getCount() : -1);
-        int seconds = (fileSeconds != null ? fileSeconds.getCount() : -1);
+        int ticks = (fileTicks != null ? fileTicks.getCount() : 100);
+        int seconds = (fileSeconds != null ? fileSeconds.getCount() : 100);
         return new Termination(ticks, seconds);
     }
 
@@ -122,7 +122,7 @@ public class File {
 
         List<Action> actions;
         try {
-            Validation.stringNoSpaceValidation(trimmedName);
+//            Validation.stringNoSpaceValidation(trimmedName);
             actions = buildActions(fileRule.getPRDActions());
         } catch (ValidationException e) {
             throw new ValidationException("Rule: " + trimmedName + " -> " + e.getMessage());
@@ -207,8 +207,9 @@ public class File {
         } else if (fileAction.getType().equals(ActionType.PROXIMITY)) {
             Validation.isEntityExists(entities, fileAction.getPRDBetween().getSourceEntity());
             Validation.isEntityExists(entities, fileAction.getPRDBetween().getTargetEntity());
+            Validation.ifEnvIsValid(environment, fileAction.getPRDEnvDepth().getOf());
             List<Action> actions = buildActions(fileAction.getPRDActions());
-            return new Proximity(fileAction.getPRDBetween().getSourceEntity(), fileAction.getPRDBetween().getTargetEntity(), Convert.stringToInteger(fileAction.getPRDEnvDepth().getOf()), actions);
+            return new Proximity(fileAction.getPRDBetween().getSourceEntity(), fileAction.getPRDBetween().getTargetEntity(),fileAction.getPRDEnvDepth().getOf(), actions);
         } else if (fileAction.getType().equals(ActionType.REPLACE)) {
             Validation.isEntityExists(entities, fileAction.getKill());
             Validation.isEntityExists(entities, fileAction.getCreate());
@@ -233,15 +234,21 @@ public class File {
             else {
                 throw new ValidationException("condition must contain a value");
             }
+            // TODO: fix - single condition receives property, I did not defined the last change as a property(ticks func) so it return null property
+            if(Function.whichFunction(fileCondition.getProperty()) != null) {
+                return new SingleCondition(fileCondition.getEntity(), new Property(fileCondition.getProperty(), PropertyType.DECIMAL), thenAction, elseAction, fileCondition.getOperator(), fileCondition.getValue());
+            }
             return new SingleCondition(fileCondition.getEntity(), entities.get(fileCondition.getEntity()).getProperties().get(fileCondition.getProperty()), thenAction, elseAction, fileCondition.getOperator(), fileCondition.getValue());
         }
         else if(fileCondition.getSingularity().equals(Condition.MULTIPLE)) {
             List<Condition> conditions = new ArrayList<>();
             for(PRDCondition c1 : fileCondition.getPRDCondition()) {
-                Condition c = buildCondition(c1, entity, property, fileThen, fileElse, Condition.TYPE.INNER);
+                Condition c = buildCondition(c1, c1.getEntity(), c1.getProperty(), fileThen, fileElse, Condition.TYPE.INNER);
                 conditions.add(c);
             }
-            return new MultipleCondition(entity, entities.get(entity).getProperties().get(property), thenAction, elseAction, conditions, fileCondition.getLogical());
+            Property workEntity = null;
+            if(entity != null) workEntity = entities.get(entity).getProperties().get(property);
+            return new MultipleCondition(entity, workEntity, thenAction, elseAction, conditions, fileCondition.getLogical());
         }
         return new Condition();
     }
@@ -255,7 +262,7 @@ public class File {
 //                throw new ValidationException("Population cannot be negative");
 //            }
 
-            Entity entity = new Entity(trimmedName, 20);
+            Entity entity = new Entity(trimmedName, 0);
             for(PRDProperty fileProp : fileEntity.getPRDProperties().getPRDProperty()) {
                 Property p;
                 if(entity.getProperties().containsKey(fileProp.getPRDName())) {

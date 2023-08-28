@@ -6,6 +6,7 @@ import def.PropertyType;
 import def.World;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
+import simulation.InvokeKit;
 import utils.exception.SimulationException;
 import utils.func.Convert;
 import utils.object.Grid;
@@ -31,7 +32,11 @@ public class Calculation extends Action {
     }
 
     @Override
-    public void invoke(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid) throws SimulationException {
+    public void invoke(InvokeKit invokeKit) throws SimulationException {
+        EntityInstance entityInstance = invokeKit.getEntityInstance();
+        EnvironmentInstance env = invokeKit.getEnv();
+        int ticks = invokeKit.getTicks();
+
         Object v1 = arg1;
         Object v2 = arg2;
         String resultPropType = resultProp.getType();
@@ -43,23 +48,23 @@ public class Calculation extends Action {
         }
 
         if(Function.whichFunction(arg1) != null) {
-            v1 = Convert.stringToDouble(Function.getFuncInput(arg1, resultPropType, env));
+            v1 = Convert.stringToDouble(Function.getFuncInput(arg1, resultPropType, env, null));
         }
         if(Function.whichFunction(arg2) != null) {
-            v2 = Convert.stringToDouble(Function.getFuncInput(arg2, resultPropType, env));
+            v2 = Convert.stringToDouble(Function.getFuncInput(arg2, resultPropType, env, null));
         }
         if(calcType == TYPES.MULT) {
             Double result = Double.parseDouble(v1.toString()) * Double.parseDouble(v2.toString());
             if(resultProp.getRange().on(result)) {
                 if(PropertyType.isDecimal(resultPropType)) {
-                    entityInstance.setProperty(resultProp.getName(),result.intValue());
+                    entityInstance.setProperty(resultProp.getName(),result.intValue(), ticks);
                 } else {
-                    entityInstance.setProperty(resultProp.getName(),result);
+                    entityInstance.setProperty(resultProp.getName(),result, ticks);
                 }
             }
         } else if (calcType == TYPES.DIV) {
             Double result = Double.valueOf(v1.toString()) / Double.valueOf(v2.toString());
-            if(resultProp.getRange().on(result)) entityInstance.setProperty(resultProp.getName(), (PropertyType.isDecimal(resultPropType) ? result.intValue() : result));
+            if(resultProp.getRange().on(result)) entityInstance.setProperty(resultProp.getName(), (PropertyType.isDecimal(resultPropType) ? result.intValue() : result), ticks);
         } else {
             throw new SimulationException("no such calculation " + calcType);
         }

@@ -1,9 +1,14 @@
 package def.action;
 
+import def.Function;
+import def.PropertyType;
 import def.World;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
+import simulation.Context;
+import simulation.InvokeKit;
 import utils.exception.SimulationException;
+import utils.func.Convert;
 import utils.object.Grid;
 
 import java.util.List;
@@ -11,10 +16,10 @@ import java.util.Map;
 
 public class Proximity extends Action {
     private String targetEntity;
-    private int envDepth;
+    private String envDepth;
     private List<Action> actions;
 
-    public Proximity(String entity, String targetEntity, int envDepth, List<Action> actions) {
+    public Proximity(String entity, String targetEntity, String envDepth, List<Action> actions) {
         super(ActionType.PROXIMITY, entity);
         this.targetEntity = targetEntity;
         this.envDepth = envDepth;
@@ -22,23 +27,25 @@ public class Proximity extends Action {
     }
 
     @Override
-    public void invoke(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid) throws SimulationException {
-        System.out.println("Invoke proximity");
+    public void invoke(InvokeKit invokeKit) throws SimulationException {
+        EntityInstance entityInstance = invokeKit.getEntityInstance();
+        Map<String, List<EntityInstance>> entities = invokeKit.getEntities();
+        EnvironmentInstance env = invokeKit.getEnv();
+        String val = Function.getFuncInput(envDepth, PropertyType.DECIMAL, env, null);
+        int envDepthValue = Convert.stringToDouble(val).intValue();
+
         entities.get(targetEntity).stream().filter(EntityInstance::getAlive).forEach(target -> {
             int xDistance = Math.abs(entityInstance.getPosition().getX() - target.getPosition().getX());
             int yDistance = Math.abs(entityInstance.getPosition().getY() - target.getPosition().getY());
-            if(xDistance <= envDepth && yDistance <= envDepth) {
-                System.out.println("Look here: " + entityInstance.getPosition() +" " + target.getPosition());
+            if(xDistance <= envDepthValue && yDistance <= envDepthValue) {
                 actions.forEach(action -> {
-                    entities.get(action.getEntity()).stream().filter(EntityInstance::getAlive).forEach(entityInstance1 -> {
-                            if(entityInstance.getAlive()) {
-                                try {
-                                    action.invoke(entityInstance, env, entities, world, grid);
-                                } catch (SimulationException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                    });
+                    if(entityInstance.getAlive()) {
+                        try {
+                            action.invoke(new InvokeKit(invokeKit, new Context(target)));
+                        } catch (SimulationException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
                 });
             }
         });
