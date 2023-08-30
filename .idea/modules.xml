@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Predictions.iml" filepath="$PROJECT_DIR$/Predictions.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/console/console.iml" filepath="$PROJECT_DIR$/com/predict/console/console.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/engine/engine.iml" filepath="$PROJECT_DIR$/com/predict/engine/engine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/com/predict/gui/gui.iml" filepath="$PROJECT_DIR$/com/predict/gui/gui.iml" />
     </modules>
   </component>
 </project>
