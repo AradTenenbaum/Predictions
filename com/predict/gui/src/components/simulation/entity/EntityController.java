@@ -2,9 +2,7 @@ package components.simulation.entity;
 
 import data.dto.EntityDto;
 import data.dto.PropertyDto;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,13 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
-import utils.object.Range;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class EntityController {
 
@@ -45,41 +37,46 @@ public class EntityController {
 
     private EntityDto currentEntity;
 
+    public void setCurrentEntity(EntityDto currentEntity) {
+        this.currentEntity = currentEntity;
+        setDisplay();
+    }
+
+    private void setDisplay() {
+        if(currentEntity != null) {
+            entityName.setText(currentEntity.getName());
+            populationAmount.setText("Population: " + currentEntity.getPopulation());
+
+            nameCol.setCellValueFactory(
+                    new PropertyValueFactory<PropertyDto, String>("name")
+            );
+            typeCol.setCellValueFactory(
+                    new PropertyValueFactory<PropertyDto, String>("type")
+            );
+            rangeCol.setCellValueFactory(
+                    param -> {
+                        SimpleStringProperty prop = new SimpleStringProperty();
+                        if(param.getValue().getRange() != null) prop.set(param.getValue().getRange().getFrom() + " - " + param.getValue().getRange().getTo());
+                        else prop.set("-");
+                        return prop;
+                    }
+            );
+            randomCol.setCellValueFactory(
+                    param -> new SimpleStringProperty((param.getValue().getRandom() != null) ? (param.getValue().getRandom() ? "Yes" : "No") : "No")
+            );
+
+            final ObservableList<PropertyDto> data =
+                    FXCollections.observableArrayList(
+                            currentEntity.getProperties()
+                    );
+
+            propTable.setItems(data);
+        }
+    }
+
     @FXML
     private void initialize() {
-        currentEntity = new EntityDto("Person", 50, Arrays.asList(
-                new PropertyDto("age", "decimal", new Range(20, 70), false),
-                new PropertyDto("name", "string", null),
-                new PropertyDto("money", "decimal", new Range(2000, 7000), true)
-        ));
 
-        entityName.setText(currentEntity.getName());
-        populationAmount.setText(String.valueOf(currentEntity.getPopulation()));
-
-        nameCol.setCellValueFactory(
-                new PropertyValueFactory<PropertyDto, String>("name")
-        );
-        typeCol.setCellValueFactory(
-                new PropertyValueFactory<PropertyDto, String>("type")
-        );
-        rangeCol.setCellValueFactory(
-                param -> {
-                    SimpleStringProperty prop = new SimpleStringProperty();
-                    if(param.getValue().getRange() != null) prop.set(param.getValue().getRange().getFrom() + " - " + param.getValue().getRange().getTo());
-                    else prop.set("-");
-                    return prop;
-                }
-        );
-        randomCol.setCellValueFactory(
-                param -> new SimpleStringProperty((param.getValue().getRandom() != null) ? (param.getValue().getRandom() ? "Yes" : "No") : "-")
-        );
-
-        final ObservableList<PropertyDto> data =
-                FXCollections.observableArrayList(
-                        currentEntity.getProperties()
-                );
-
-        propTable.setItems(data);
     }
 
 }

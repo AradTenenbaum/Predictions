@@ -1,5 +1,7 @@
 package components.main;
 
+import components.details.DetailsController;
+import def.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,6 +17,7 @@ import java.io.IOException;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import simulation.Manager;
 import utils.Helpers;
 
 import javax.naming.Binding;
@@ -29,6 +32,9 @@ public class MainController {
     private SimpleStringProperty selectedFileProperty;
     private SimpleBooleanProperty isFileLoaded;
     private Stage primaryStage;
+    private DetailsController detailsController;
+
+    private Manager manager;
 
     @FXML
     private void showDetails() {
@@ -46,15 +52,20 @@ public class MainController {
     }
 
     public MainController() {
+        manager = new Manager();
         selectedFileProperty = new SimpleStringProperty();
         isFileLoaded = new SimpleBooleanProperty();
         helpers = new Helpers();
     }
 
+    public void setDetailsController(DetailsController detailsController) {
+        this.detailsController = detailsController;
+    }
+
     @FXML
     private void initialize() {
         filePathLabel.textProperty().bind(Bindings.when(isFileLoaded).then(selectedFileProperty).otherwise("File is not loaded"));
-        showDetails();
+//        showDetails();
     }
 
     public void setPrimaryStage(Stage primaryStage) {
@@ -72,8 +83,15 @@ public class MainController {
         }
 
         String absolutePath = selectedFile.getAbsolutePath();
-        isFileLoaded.set(true);
-        selectedFileProperty.set(absolutePath);
+        try {
+            data.source.File.fetchDataFromFile(absolutePath, manager);
+            helpers.loadComponent(Helpers.DETAILS_PATH, placeholder);
+            detailsController.setWorldDto(manager.getSharedWorld());
+            isFileLoaded.set(true);
+            selectedFileProperty.set(absolutePath);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

@@ -39,7 +39,7 @@ public class Helpers {
         }
     }
 
-    private void fitParent(Pane parent, Pane child) {
+    public void fitParent(Pane parent, Pane child) {
         child.prefWidthProperty().bind(parent.widthProperty());
         child.prefHeightProperty().bind(parent.heightProperty());
     }
