@@ -1,14 +1,17 @@
 package components.main;
 
 import components.details.DetailsController;
+import data.dto.WorldDto;
 import def.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -32,8 +35,6 @@ public class MainController {
     private SimpleStringProperty selectedFileProperty;
     private SimpleBooleanProperty isFileLoaded;
     private Stage primaryStage;
-    private DetailsController detailsController;
-
     private Manager manager;
 
     @FXML
@@ -58,10 +59,6 @@ public class MainController {
         helpers = new Helpers();
     }
 
-    public void setDetailsController(DetailsController detailsController) {
-        this.detailsController = detailsController;
-    }
-
     @FXML
     private void initialize() {
         filePathLabel.textProperty().bind(Bindings.when(isFileLoaded).then(selectedFileProperty).otherwise("File is not loaded"));
@@ -70,6 +67,24 @@ public class MainController {
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+    }
+
+    public void loadComponent(String fxmlFile, Pane placeholder, WorldDto worldDto) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            Pane component = loader.load();
+            DetailsController detailsController = loader.getController();
+            detailsController.setWorldDto(worldDto);
+            helpers.fitParent(placeholder, component);
+
+            SplitPane p = (SplitPane) component.getChildren().get(0);
+            p.prefWidthProperty().bind(component.widthProperty());
+            p.prefHeightProperty().bind(component.heightProperty());
+
+            placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -85,8 +100,7 @@ public class MainController {
         String absolutePath = selectedFile.getAbsolutePath();
         try {
             data.source.File.fetchDataFromFile(absolutePath, manager);
-            helpers.loadComponent(Helpers.DETAILS_PATH, placeholder);
-            detailsController.setWorldDto(manager.getSharedWorld());
+            loadComponent(Helpers.DETAILS_PATH, placeholder,manager.getSharedWorld());
             isFileLoaded.set(true);
             selectedFileProperty.set(absolutePath);
         } catch (Exception e) {

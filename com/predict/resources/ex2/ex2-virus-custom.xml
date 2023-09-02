@@ -5,6 +5,63 @@
 		<PRD-env-property type="float">
 			<PRD-name>infection-proximity</PRD-name>			
 		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity1</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity2</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity3</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity4</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity5</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity6</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity7</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity8</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity9</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity10</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity11</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity12</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity13</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity14</PRD-name>			
+		</PRD-env-property>
+				<PRD-env-property type="float">
+			<PRD-name>infection-proximity15</PRD-name>			
+		</PRD-env-property>
+					<PRD-env-property type="float">
+			<PRD-name>infection-proximity16</PRD-name>			
+		</PRD-env-property>
+						<PRD-env-property type="float">
+			<PRD-name>infection-proximity17</PRD-name>			
+		</PRD-env-property>
+						<PRD-env-property type="float">
+			<PRD-name>infection-proximity18</PRD-name>			
+		</PRD-env-property>
+						<PRD-env-property type="float">
+			<PRD-name>infection-proximity19</PRD-name>			
+		</PRD-env-property>
 	</PRD-environment>
 	<PRD-grid rows="50" columns="30"/>
 	<PRD-entities>

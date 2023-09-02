@@ -1,7 +1,9 @@
 package components.details;
 
 import components.simulation.entity.EntityController;
+import components.simulation.environment.EnvController;
 import data.dto.EntityDto;
+import data.dto.EnvironmentDto;
 import data.dto.PropertyDto;
 import data.dto.WorldDto;
 import javafx.beans.binding.Bindings;
@@ -12,10 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -32,20 +31,13 @@ public class DetailsController {
     Pane detailsDisplay;
     @FXML
     Pane screenContainer;
-    private Map<String, String> itemToPath;
     private Helpers helpers;
-    private SimpleStringProperty selectedItem;
-    private EntityController entityController;
-    private TreeItem<String> entitiesItem;
     private TreeItem<String> rootItem;
     private WorldDto worldDto;
 
     public DetailsController() {
         rootItem = new TreeItem<>("Simulation");
-        entitiesItem = new TreeItem<>("Entities");
-        selectedItem = new SimpleStringProperty();
         helpers = new Helpers();
-        itemToPath = new HashMap<>();
     }
 
     public void setWorldDto(WorldDto worldDto) {
@@ -53,32 +45,70 @@ public class DetailsController {
         setDisplay();
     }
 
-    public void setEntityController(EntityController entityController) {
-        this.entityController = entityController;
-    }
-
     private void setDisplay() {
 //        itemToPath.put("Simulation", Helpers);
         TreeItem<String> environmentItem = new TreeItem<>("Environment");
-//        itemToPath.put("Environment", Helpers);
         TreeItem<String> rulesItem = new TreeItem<>("Rules");
 //        itemToPath.put("Rules", Helpers);
         TreeItem<String> gridItem = new TreeItem<>("Grid");
 //        itemToPath.put("Grid", Helpers);
         TreeItem<String> terminationItem = new TreeItem<>("Termination");
 //        itemToPath.put("Termination", Helpers);
+        TreeItem<String> entitiesItem = new TreeItem<>("Entities");
 
-
+        rootItem.getChildren().clear();
         rootItem.getChildren().addAll(environmentItem, entitiesItem, rulesItem, gridItem, terminationItem);
         if(worldDto != null) {
             worldDto.getEntities().forEach(entityDto -> {
                 TreeItem<String> entity = new TreeItem<>(entityDto.getName());
                 entitiesItem.getChildren().add(entity);
-                itemToPath.put(entityDto.getName(), Helpers.ENTITY_PATH);
+            });
+
+            worldDto.getRules().forEach(ruleDto -> {
+                TreeItem<String> ruleItem = new TreeItem<>(ruleDto.getName());
+                ruleDto.getActions().forEach(s -> {
+                    TreeItem<String> actionItem = new TreeItem<>(s);
+                    ruleItem.getChildren().add(actionItem);
+                });
+                rulesItem.getChildren().add(ruleItem);
             });
         }
         treeView.setRoot(rootItem);
 
+    }
+
+    public void loadEntity(String fxmlFile, Pane placeholder, EntityDto entityDto) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            Pane component = loader.load();
+            EntityController entityController = loader.getController();
+            entityController.setCurrentEntity(entityDto);
+            helpers.fitParent(placeholder, component);
+            VBox p = (VBox) component.getChildren().get(0);
+            p.prefWidthProperty().bind(component.widthProperty());
+            p.prefHeightProperty().bind(component.heightProperty());
+
+            placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadEnv(String fxmlFile, Pane placeholder, EnvironmentDto environmentDto) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            Pane component = loader.load();
+            EnvController envController = loader.getController();
+            envController.setCurrentEnv(environmentDto);
+            helpers.fitParent(placeholder, component);
+            TableView p = (TableView) component.getChildren().get(0);
+            p.prefWidthProperty().bind(component.widthProperty());
+            p.prefHeightProperty().bind(component.heightProperty());
+
+            placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -90,10 +120,14 @@ public class DetailsController {
     public void selectItem() {
         TreeItem<String> item = (TreeItem<String>) treeView.getSelectionModel().getSelectedItem();
         if(item != null) {
-            if(itemToPath.containsKey(item.getValue())) {
-                helpers.loadComponent(itemToPath.get(item.getValue()), detailsDisplay);
+            if(item.getValue().equals("Environment")) {
+                loadEnv(Helpers.ENV_PATH, detailsDisplay, worldDto.getEnvironment());
+            }
+            else {
                 Optional<EntityDto> foundEntityDto = worldDto.getEntities().stream().filter(entityDto -> entityDto.getName().equals(item.getValue())).findFirst();
-                foundEntityDto.ifPresent(entityDto -> entityController.setCurrentEntity(entityDto));
+                if (foundEntityDto.isPresent()) {
+                    loadEntity(Helpers.ENTITY_PATH, detailsDisplay, foundEntityDto.get());
+                }
             }
         }
     }

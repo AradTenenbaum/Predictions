@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.Pane?>
+
+
+<Pane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.simulation.environment.EnvController">
+   <children>
+      <TableView fx:id="propTable" layoutX="14.0">
+        <columns>
+          <TableColumn fx:id="nameCol" minWidth="-Infinity" prefWidth="150.0" text="Name" />
+          <TableColumn fx:id="typeCol" prefWidth="100.0" text="Type" />
+        </columns>
+      </TableView>
+   </children>
+</Pane>

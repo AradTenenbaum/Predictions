@@ -27,15 +27,7 @@ public class Main extends Application {
         loader.setLocation(mainFXML);
         VBox root = loader.load();
 
-        FXMLLoader loaderDetails = new FXMLLoader(getClass().getResource(Helpers.DETAILS_PATH));
-        loaderDetails.load();
-        FXMLLoader loaderEntity = new FXMLLoader(getClass().getResource(Helpers.ENTITY_PATH));
-        loaderEntity.load();
-
         MainController mainController = loader.getController();
-        DetailsController detailsController = loaderDetails.getController();
-        mainController.setDetailsController(detailsController);
-        detailsController.setEntityController(loaderEntity.getController());
 
         mainController.setPrimaryStage(primaryStage);
 
