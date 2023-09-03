@@ -81,6 +81,22 @@ public class Calculation extends Action {
         }
     }
 
+    public Property getResultProp() {
+        return resultProp;
+    }
+
+    public TYPES getCalcType() {
+        return calcType;
+    }
+
+    public String getArg1() {
+        return arg1;
+    }
+
+    public String getArg2() {
+        return arg2;
+    }
+
     @Override
     public String toString() {
         return "Calculation{" +

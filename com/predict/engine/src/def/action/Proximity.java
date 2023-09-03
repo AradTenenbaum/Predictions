@@ -26,6 +26,18 @@ public class Proximity extends Action {
         this.actions = actions;
     }
 
+    public String getTargetEntity() {
+        return targetEntity;
+    }
+
+    public String getEnvDepth() {
+        return envDepth;
+    }
+
+    public List<Action> getActions() {
+        return actions;
+    }
+
     @Override
     public void invoke(InvokeKit invokeKit) throws SimulationException {
         EntityInstance entityInstance = invokeKit.getEntityInstance();

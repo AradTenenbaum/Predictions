@@ -73,6 +73,13 @@ public class SingleCondition extends Condition {
         return false;
     }
 
+    public String getOperator() {
+        return operator;
+    }
+
+    public String getValue() {
+        return value;
+    }
 
     @Override
     public String toString() {

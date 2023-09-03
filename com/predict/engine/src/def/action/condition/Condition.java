@@ -19,8 +19,8 @@ public class Condition extends Action {
     protected List<Action> thenActions;
     protected List<Action> elseActions;
 
-    public static String SINGLE = "single";
-    public static String MULTIPLE = "multiple";
+    public static final String SINGLE = "single";
+    public static final String MULTIPLE = "multiple";
     public static enum TYPE {
         OUTER, INNER
     }
@@ -75,6 +75,14 @@ public class Condition extends Action {
                 });
             }
         }
+    }
+
+    public List<Action> getThenActions() {
+        return thenActions;
+    }
+
+    public List<Action> getElseActions() {
+        return elseActions;
     }
 
     @Override

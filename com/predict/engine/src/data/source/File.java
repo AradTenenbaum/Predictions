@@ -94,7 +94,7 @@ public class File {
         return entities;
     }
 
-    private static Termination buildTermination(PRDTermination fileTermination) {
+    private static Termination buildTermination(PRDTermination fileTermination) throws ValidationException {
         PRDByTicks fileTicks = null;
         PRDBySecond fileSeconds = null;
         for(Object fileTerm : fileTermination.getPRDBySecondOrPRDByTicks()) {
@@ -103,8 +103,12 @@ public class File {
             if(fileTerm.getClass().toString().equals("class data.jaxb.PRDBySecond"))
                 fileSeconds = (PRDBySecond)(fileTerm);
         }
-        int ticks = (fileTicks != null ? fileTicks.getCount() : 100);
-        int seconds = (fileSeconds != null ? fileSeconds.getCount() : 100);
+        int ticks = (fileTicks != null ? fileTicks.getCount() : -1);
+        int seconds = (fileSeconds != null ? fileSeconds.getCount() : -1);
+        if(ticks == -1 && seconds == -1) {
+            if(fileTermination.getPRDByUser() != null) return new Termination(true);
+            else throw new ValidationException("No valid termination");
+        }
         return new Termination(ticks, seconds);
     }
 

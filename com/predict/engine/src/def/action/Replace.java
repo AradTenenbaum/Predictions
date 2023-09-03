@@ -53,4 +53,12 @@ public class Replace extends Action {
         grid.setPos(entityInstance.getPosition(), newEntIns.getId());
         toCreate.add(newEntIns);
     }
+
+    public String getCreateEntity() {
+        return createEntity;
+    }
+
+    public String getMode() {
+        return mode;
+    }
 }

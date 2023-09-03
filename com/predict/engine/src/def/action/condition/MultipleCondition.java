@@ -42,6 +42,14 @@ public class MultipleCondition extends Condition {
         return false;
     }
 
+    public List<Condition> getConditions() {
+        return conditions;
+    }
+
+    public String getLogical() {
+        return logical;
+    }
+
     @Override
     public String toString() {
         return "MultipleCondition{" +

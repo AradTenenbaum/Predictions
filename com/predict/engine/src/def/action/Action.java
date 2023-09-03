@@ -65,6 +65,10 @@ public class Action implements Serializable {
         return property;
     }
 
+    public String getBy() {
+        return by;
+    }
+
     public void invoke(InvokeKit invokeKit) throws SimulationException {
         EntityInstance entityInstance;
         if(invokeKit.getEntityInstance().getName().equals(entity)) {

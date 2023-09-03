@@ -1,11 +1,13 @@
 package components.details;
 
+import components.simulation.actions.ActionController;
 import components.simulation.entity.EntityController;
 import components.simulation.environment.EnvController;
-import data.dto.EntityDto;
-import data.dto.EnvironmentDto;
-import data.dto.PropertyDto;
-import data.dto.WorldDto;
+import components.simulation.grid.GridController;
+import components.simulation.termination.TerminationController;
+import data.dto.*;
+import data.dto.actions.ActionDto;
+import def.Termination;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -19,10 +21,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import utils.Helpers;
+import utils.object.Grid;
 import utils.object.Range;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DetailsController {
     @FXML
@@ -34,9 +39,11 @@ public class DetailsController {
     private Helpers helpers;
     private TreeItem<String> rootItem;
     private WorldDto worldDto;
+    private Map<String, List<ActionDto>> actionsToRulesList;
 
     public DetailsController() {
-        rootItem = new TreeItem<>("Simulation");
+        actionsToRulesList = new HashMap<>();
+        rootItem = new TreeItem<>("World");
         helpers = new Helpers();
     }
 
@@ -46,14 +53,10 @@ public class DetailsController {
     }
 
     private void setDisplay() {
-//        itemToPath.put("Simulation", Helpers);
         TreeItem<String> environmentItem = new TreeItem<>("Environment");
         TreeItem<String> rulesItem = new TreeItem<>("Rules");
-//        itemToPath.put("Rules", Helpers);
         TreeItem<String> gridItem = new TreeItem<>("Grid");
-//        itemToPath.put("Grid", Helpers);
         TreeItem<String> terminationItem = new TreeItem<>("Termination");
-//        itemToPath.put("Termination", Helpers);
         TreeItem<String> entitiesItem = new TreeItem<>("Entities");
 
         rootItem.getChildren().clear();
@@ -66,8 +69,10 @@ public class DetailsController {
 
             worldDto.getRules().forEach(ruleDto -> {
                 TreeItem<String> ruleItem = new TreeItem<>(ruleDto.getName());
-                ruleDto.getActions().forEach(s -> {
-                    TreeItem<String> actionItem = new TreeItem<>(s);
+                actionsToRulesList.put(ruleDto.getName(), new ArrayList<>());
+                ruleDto.getActions().forEach(actionDto -> {
+                    actionsToRulesList.get(ruleDto.getName()).add(actionDto);
+                    TreeItem<String> actionItem = new TreeItem<>((actionsToRulesList.get(ruleDto.getName()).size()) + ". " + actionDto.getType());
                     ruleItem.getChildren().add(actionItem);
                 });
                 rulesItem.getChildren().add(ruleItem);
@@ -111,17 +116,84 @@ public class DetailsController {
         }
     }
 
+    public void loadAction(String fxmlFile, Pane placeholder, ActionDto actionDto) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            VBox component = loader.load();
+            ActionController actionController = loader.getController();
+            actionController.setCurrentAction(actionDto);
+            helpers.fitParent(placeholder, component);
+
+            placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadGrid(String fxmlFile, Pane placeholder, GridDto grid) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            VBox component = loader.load();
+            GridController gridController = loader.getController();
+            gridController.setGrid(grid);
+            helpers.fitParent(placeholder, component);
+
+            placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadTermination(String fxmlFile, Pane placeholder, TerminationDto terminationDto) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            VBox component = loader.load();
+            TerminationController terminationController = loader.getController();
+            terminationController.setCurrentTermination(terminationDto);
+            helpers.fitParent(placeholder, component);
+
+            placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     private void initialize() {
         setDisplay();
+    }
+
+    private int getIndexFromTreeItemString(String treeItemString) {
+        Pattern pattern = Pattern.compile("^\\d+");
+
+        Matcher matcher = pattern.matcher(treeItemString);
+
+        if(matcher.find()) {
+            String numberString = matcher.group();
+
+            try {
+                int number = Integer.parseInt(numberString);
+                return number-1;
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        }
+        return -1;
     }
 
     @FXML
     public void selectItem() {
         TreeItem<String> item = (TreeItem<String>) treeView.getSelectionModel().getSelectedItem();
         if(item != null) {
-            if(item.getValue().equals("Environment")) {
+            if(item.getParent() != null && actionsToRulesList.containsKey(item.getParent().getValue())) {
+                loadAction(Helpers.ACTION_PATH, detailsDisplay, actionsToRulesList.get(item.getParent().getValue()).get(getIndexFromTreeItemString(item.getValue())));
+            }
+            else if(item.getValue().equals("Environment")) {
                 loadEnv(Helpers.ENV_PATH, detailsDisplay, worldDto.getEnvironment());
+            } else if(item.getValue().equals("Grid")) {
+                loadGrid(Helpers.GRID_PATH, detailsDisplay, worldDto.getGridDto());
+            } else if(item.getValue().equals("Termination")) {
+                loadTermination(Helpers.TERMINATION_PATH, detailsDisplay, worldDto.getTermination());
             }
             else {
                 Optional<EntityDto> foundEntityDto = worldDto.getEntities().stream().filter(entityDto -> entityDto.getName().equals(item.getValue())).findFirst();

@@ -15,6 +15,9 @@ public class Helpers {
     public final static String RESULTS_PATH = COMPONENTS_PATH + "/results/results.fxml";
     public final static String ENTITY_PATH = SIMULATION_PATH + "/entity/entity.fxml";
     public final static String ENV_PATH = SIMULATION_PATH + "/environment/environment.fxml";
+    public final static String ACTION_PATH = SIMULATION_PATH + "/actions/action.fxml";
+    public final static String GRID_PATH = SIMULATION_PATH + "/grid/grid.fxml";
+    public final static String TERMINATION_PATH = SIMULATION_PATH + "/termination/termination.fxml";
 
 
     public void loadComponent(String fxmlFile, Pane placeholder) {
