@@ -19,7 +19,7 @@ public class Replace extends Action {
     private final String DERIVED = "derived";
 
     public Replace(String entity, String createEntity, String mode) {
-        super(ActionType.REPLACE, entity);
+        super(ActionType.REPLACE, entity, null);
         this.createEntity = createEntity;
         this.mode = mode;
     }

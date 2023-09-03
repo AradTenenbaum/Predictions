@@ -7,10 +7,13 @@ import ins.EntityInstance;
 import ins.PropertyInstance;
 import ins.environment.EnvironmentInstance;
 import utils.exception.SimulationException;
+import utils.func.RandomGenerator;
 import utils.object.Grid;
+import utils.object.Range;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Manager implements Serializable {
     private World currentWorld;
@@ -98,7 +101,45 @@ public class Manager implements Serializable {
                     rule.getActions().forEach(action -> {
                         entities.get(action.getEntity()).stream().filter(EntityInstance::getAlive).forEach(entityInstance -> {
                             try {
-                                if(entityInstance.getAlive()) action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks));
+                                if(entityInstance.getAlive()) {
+                                    if(action.getSecondaryEntity().isPresent()) {
+                                        List<EntityInstance> secondaries = entities.get(action.getSecondaryEntity().get().getName())
+                                                .stream()
+                                                .filter(secEntityInstance -> {
+                                                    if(action.getSecondaryEntity().get().getCondition().isPresent()) {
+                                                        try {
+                                                            return action.getSecondaryEntity().get().getCondition().get().isTrue(secEntityInstance, env, null);
+                                                        } catch (SimulationException e) {
+                                                            throw new RuntimeException("An error occurred");
+                                                        }
+                                                    }
+                                                    return true;
+                                                }).collect(Collectors.toList());
+                                        if(action.getSecondaryEntity().get().isAll()) {
+                                            secondaries.forEach(secEntity -> {
+                                                try {
+                                                    action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks, new Context(secEntity)));
+                                                } catch (SimulationException e) {
+                                                    throw new RuntimeException("An error occurred");
+                                                }
+                                            });
+                                        } else {
+                                            if(secondaries.size() > 0) {
+                                                for(int i = 0; i < action.getSecondaryEntity().get().getCount(); i++) {
+                                                    EntityInstance randomSecEntity = secondaries.get(RandomGenerator.getInt(new Range(0, secondaries.size()-1)));
+                                                    try {
+                                                        action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks, new Context(randomSecEntity)));
+                                                    } catch (SimulationException e) {
+                                                        throw new RuntimeException("An error occurred");
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks));
+                                    }
+                                }
                             } catch (SimulationException e) {
                                 throw new RuntimeException(action.getEntity() + " -> " + rule.getName() + " -> " + e.getMessage());
                             }

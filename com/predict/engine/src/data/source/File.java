@@ -158,6 +158,24 @@ public class File {
     }
 
     private static Action buildAction(PRDAction fileAction) throws ValidationException {
+        if(fileAction == null) return null;
+        SecondaryEntity secondaryEntity = null;
+        if(fileAction.getPRDSecondaryEntity() != null) {
+            Validation.isEntityExists(entities, fileAction.getPRDSecondaryEntity().getEntity());
+            Condition condition = null;
+            if(fileAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition() != null) {
+                condition = buildCondition(
+                        fileAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition(),
+                        fileAction.getPRDSecondaryEntity().getEntity(),
+                        fileAction.getPRDSecondaryEntity().getPRDSelection().getPRDCondition().getProperty(),
+                        null, null,
+                        Condition.TYPE.OUTER,
+                        null
+                        );
+            }
+            int count = (fileAction.getPRDSecondaryEntity().getPRDSelection().getCount().equals("ALL") ? SecondaryEntity.ALL : Integer.parseInt(fileAction.getPRDSecondaryEntity().getPRDSelection().getCount()));
+            secondaryEntity = new SecondaryEntity(fileAction.getPRDSecondaryEntity().getEntity(), count, condition);
+        }
         if(fileAction.getType().equals(ActionType.INCREASE) || fileAction.getType().equals(ActionType.DECREASE) ) {
             Validation.isEntityPropertyExists(entities, fileAction.getEntity(), fileAction.getProperty());
             Validation.isPropertyValidNumber(entities, fileAction.getEntity(), fileAction.getProperty());
@@ -168,7 +186,7 @@ public class File {
             else {
                 throw new ValidationException("action increase/decrease have to receive a by value");
             }
-            return new Action(fileAction.getType(), fileAction.getEntity(), entities.get(fileAction.getEntity()).getProperties().get(fileAction.getProperty()), fileAction.getBy());
+            return new Action(fileAction.getType(), fileAction.getEntity(), entities.get(fileAction.getEntity()).getProperties().get(fileAction.getProperty()), fileAction.getBy(), secondaryEntity);
         }
         else if(fileAction.getType().equals(ActionType.CALCULATION)) {
             Validation.isEntityPropertyExists(entities, fileAction.getEntity(), fileAction.getResultProp());
@@ -191,19 +209,19 @@ public class File {
 
             Validation.calculationValidation(environment, entities, fileAction.getEntity(), fileAction.getResultProp(), arg1, arg2);
 
-            return new Calculation(fileAction.getEntity(), entities.get(fileAction.getEntity()).getProperties().get(fileAction.getResultProp()), type, arg1, arg2);
+            return new Calculation(fileAction.getEntity(), entities.get(fileAction.getEntity()).getProperties().get(fileAction.getResultProp()), type, arg1, arg2, secondaryEntity);
         }
         else if(fileAction.getType().equals(ActionType.CONDITION)) {
-            return buildCondition(fileAction.getPRDCondition(), fileAction.getEntity(), fileAction.getProperty(), fileAction.getPRDThen(), fileAction.getPRDElse(), Condition.TYPE.OUTER);
+            return buildCondition(fileAction.getPRDCondition(), fileAction.getEntity(), fileAction.getProperty(), fileAction.getPRDThen(), fileAction.getPRDElse(), Condition.TYPE.OUTER, secondaryEntity);
         }
         else if(fileAction.getType().equals(ActionType.SET)) {
             Validation.isEntityPropertyExists(entities, fileAction.getEntity(), fileAction.getProperty());
             Validation.isTypeValid(environment, entities, fileAction.getEntity(), fileAction.getProperty(), fileAction.getValue());
-            return new Action(fileAction.getType(), fileAction.getEntity(), entities.get(fileAction.getEntity()).getProperties().get(fileAction.getProperty()), fileAction.getValue());
+            return new Action(fileAction.getType(), fileAction.getEntity(), entities.get(fileAction.getEntity()).getProperties().get(fileAction.getProperty()), fileAction.getValue(), secondaryEntity);
         }
         else if(fileAction.getType().equals(ActionType.KILL)) {
             Validation.isEntityExists(entities, fileAction.getEntity());
-            return new Action(fileAction.getType(), fileAction.getEntity());
+            return new Action(fileAction.getType(), fileAction.getEntity(), secondaryEntity);
         } else if (fileAction.getType().equals(ActionType.PROXIMITY)) {
             Validation.isEntityExists(entities, fileAction.getPRDBetween().getSourceEntity());
             Validation.isEntityExists(entities, fileAction.getPRDBetween().getTargetEntity());
@@ -219,10 +237,10 @@ public class File {
         }
     }
 
-    private static Condition buildCondition(PRDCondition fileCondition, String entity, String property, PRDThen fileThen, PRDElse fileElse, Condition.TYPE t) throws ValidationException {
+    private static Condition buildCondition(PRDCondition fileCondition, String entity, String property, PRDThen fileThen, PRDElse fileElse, Condition.TYPE t, SecondaryEntity secondaryEntity) throws ValidationException {
         List<Action> thenAction = null, elseAction = null;
         if(t == Condition.TYPE.OUTER) {
-            thenAction = buildActionsList(fileThen.getPRDAction());
+            if(fileThen != null) thenAction = buildActionsList(fileThen.getPRDAction());
             if(fileElse != null) elseAction = buildActionsList(fileElse.getPRDAction());
         }
 
@@ -236,19 +254,19 @@ public class File {
             }
             // TODO: fix - single condition receives property, I did not defined the last change as a property(ticks func) so it return null property
             if(Function.whichFunction(fileCondition.getProperty()) != null) {
-                return new SingleCondition(fileCondition.getEntity(), new Property(fileCondition.getProperty(), PropertyType.DECIMAL), thenAction, elseAction, fileCondition.getOperator(), fileCondition.getValue());
+                return new SingleCondition(fileCondition.getEntity(), new Property(fileCondition.getProperty(), PropertyType.DECIMAL), thenAction, elseAction, fileCondition.getOperator(), fileCondition.getValue(), secondaryEntity);
             }
-            return new SingleCondition(fileCondition.getEntity(), entities.get(fileCondition.getEntity()).getProperties().get(fileCondition.getProperty()), thenAction, elseAction, fileCondition.getOperator(), fileCondition.getValue());
+            return new SingleCondition(fileCondition.getEntity(), entities.get(fileCondition.getEntity()).getProperties().get(fileCondition.getProperty()), thenAction, elseAction, fileCondition.getOperator(), fileCondition.getValue(), secondaryEntity);
         }
         else if(fileCondition.getSingularity().equals(Condition.MULTIPLE)) {
             List<Condition> conditions = new ArrayList<>();
             for(PRDCondition c1 : fileCondition.getPRDCondition()) {
-                Condition c = buildCondition(c1, c1.getEntity(), c1.getProperty(), fileThen, fileElse, Condition.TYPE.INNER);
+                Condition c = buildCondition(c1, c1.getEntity(), c1.getProperty(), fileThen, fileElse, Condition.TYPE.INNER, secondaryEntity);
                 conditions.add(c);
             }
             Property workEntity = null;
             if(entity != null) workEntity = entities.get(entity).getProperties().get(property);
-            return new MultipleCondition(entity, workEntity, thenAction, elseAction, conditions, fileCondition.getLogical());
+            return new MultipleCondition(entity, workEntity, thenAction, elseAction, conditions, fileCondition.getLogical(), secondaryEntity);
         }
         return new Condition();
     }

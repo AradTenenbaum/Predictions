@@ -6,6 +6,7 @@ import def.PropertyType;
 import def.World;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
+import simulation.Context;
 import simulation.InvokeKit;
 import utils.exception.SimulationException;
 import utils.func.Convert;
@@ -23,8 +24,8 @@ public class Calculation extends Action {
     private String arg1;
     private String arg2;
 
-    public Calculation(String entity, Property resultProp, TYPES calcType, String arg1, String arg2) {
-        super(ActionType.CALCULATION, entity);
+    public Calculation(String entity, Property resultProp, TYPES calcType, String arg1, String arg2, SecondaryEntity secondaryEntity) {
+        super(ActionType.CALCULATION, entity, secondaryEntity);
         this.resultProp = resultProp;
         this.calcType = calcType;
         this.arg1 = arg1;
@@ -33,9 +34,19 @@ public class Calculation extends Action {
 
     @Override
     public void invoke(InvokeKit invokeKit) throws SimulationException {
-        EntityInstance entityInstance = invokeKit.getEntityInstance();
+        EntityInstance entityInstance;
+        if(invokeKit.getEntityInstance().getName().equals(entity)) {
+            entityInstance = invokeKit.getEntityInstance();
+        }
+        else if(invokeKit.getContext().getSecondEntity().getName().equals(entity)) {
+            entityInstance = invokeKit.getContext().getSecondEntity();
+        }
+        else {
+            throw new SimulationException("No such entity " + entity);
+        }
         EnvironmentInstance env = invokeKit.getEnv();
         int ticks = invokeKit.getTicks();
+        Context context = invokeKit.getContext();
 
         Object v1 = arg1;
         Object v2 = arg2;
@@ -48,10 +59,10 @@ public class Calculation extends Action {
         }
 
         if(Function.whichFunction(arg1) != null) {
-            v1 = Convert.stringToDouble(Function.getFuncInput(arg1, resultPropType, env, null));
+            v1 = Convert.stringToDouble(Function.getFuncInput(arg1, resultPropType, env, context));
         }
         if(Function.whichFunction(arg2) != null) {
-            v2 = Convert.stringToDouble(Function.getFuncInput(arg2, resultPropType, env, null));
+            v2 = Convert.stringToDouble(Function.getFuncInput(arg2, resultPropType, env, context));
         }
         if(calcType == TYPES.MULT) {
             Double result = Double.parseDouble(v1.toString()) * Double.parseDouble(v2.toString());

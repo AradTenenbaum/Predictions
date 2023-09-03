@@ -15,32 +15,42 @@ import utils.object.Grid;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Action implements Serializable {
     protected String type;
     protected String entity;
     protected Property property;
+    protected Optional<SecondaryEntity> secondaryEntity;
     private String by;
 
-    public Action(String type, String entity, Property property, String by) {
+
+    public Action(String type, String entity, Property property, String by, SecondaryEntity secondaryEntity) {
         this.type = type;
         this.entity = entity;
         this.property = property;
         this.by = by;
+        this.secondaryEntity = Optional.ofNullable(secondaryEntity);
     }
 
-    public Action(String type, String entity, Property property) {
+    public Action(String type, String entity, Property property, SecondaryEntity secondaryEntity) {
         this.type = type;
         this.entity = entity;
         this.property = property;
+        this.secondaryEntity = Optional.ofNullable(secondaryEntity);
     }
 
-    public Action(String type, String entity) {
+    public Action(String type, String entity, SecondaryEntity secondaryEntity) {
         this.type = type;
         this.entity = entity;
+        this.secondaryEntity = Optional.ofNullable(secondaryEntity);
     }
 
     public Action() {
+    }
+
+    public Optional<SecondaryEntity> getSecondaryEntity() {
+        return secondaryEntity;
     }
 
     public String getType() {
@@ -56,7 +66,16 @@ public class Action implements Serializable {
     }
 
     public void invoke(InvokeKit invokeKit) throws SimulationException {
-        EntityInstance entityInstance = invokeKit.getEntityInstance();
+        EntityInstance entityInstance;
+        if(invokeKit.getEntityInstance().getName().equals(entity)) {
+            entityInstance = invokeKit.getEntityInstance();
+        }
+        else if(invokeKit.getContext().getSecondEntity().getName().equals(entity)) {
+            entityInstance = invokeKit.getContext().getSecondEntity();
+        }
+        else {
+            throw new SimulationException("No such entity " + entity);
+        }
         EnvironmentInstance env = invokeKit.getEnv();
         int ticks = invokeKit.getTicks();
         Context context = invokeKit.getContext();

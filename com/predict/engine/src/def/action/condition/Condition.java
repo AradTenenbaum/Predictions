@@ -4,8 +4,10 @@ import def.Property;
 import def.World;
 import def.action.Action;
 import def.action.ActionType;
+import def.action.SecondaryEntity;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
+import simulation.Context;
 import simulation.InvokeKit;
 import utils.exception.SimulationException;
 import utils.object.Grid;
@@ -23,8 +25,8 @@ public class Condition extends Action {
         OUTER, INNER
     }
 
-    public Condition(String entity, Property property, List<Action> thenActions, List<Action> elseActions) {
-        super(ActionType.CONDITION, entity, property);
+    public Condition(String entity, Property property, List<Action> thenActions, List<Action> elseActions, SecondaryEntity secondaryEntity) {
+        super(ActionType.CONDITION, entity, property, secondaryEntity);
         this.thenActions = thenActions;
         this.elseActions = elseActions;
     }
@@ -33,16 +35,27 @@ public class Condition extends Action {
         super();
     }
 
-    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env)throws SimulationException {
+    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env, Context context)throws SimulationException {
         return null;
     }
 
     @Override
     public void invoke(InvokeKit invokeKit) throws SimulationException {
-        EntityInstance entityInstance = invokeKit.getEntityInstance();
-        EnvironmentInstance env = invokeKit.getEnv();
+        EntityInstance entityInstance;
+        if(invokeKit.getEntityInstance().getName().equals(entity)) {
+            entityInstance = invokeKit.getEntityInstance();
+        }
+        else if(invokeKit.getContext().getSecondEntity().getName().equals(entity)) {
+            entityInstance = invokeKit.getContext().getSecondEntity();
+        }
+        else {
+            throw new SimulationException("No such entity " + entity);
+        }
 
-        if(isTrue(entityInstance, env)) {
+        EnvironmentInstance env = invokeKit.getEnv();
+        Context context = invokeKit.getContext();
+
+        if(isTrue(entityInstance, env, context)) {
             thenActions.forEach(action -> {
                 try {
                     action.invoke(invokeKit);

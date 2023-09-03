@@ -2,8 +2,10 @@ package def.action.condition;
 
 import def.Property;
 import def.action.Action;
+import def.action.SecondaryEntity;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
+import simulation.Context;
 import utils.exception.SimulationException;
 
 import java.util.List;
@@ -14,23 +16,26 @@ public class MultipleCondition extends Condition {
     private List<Condition> conditions;
     private String logical;
 
-    public MultipleCondition(String entity, Property property, List<Action> thenActions, List<Action> elseActions, List<Condition> conditions, String logical) {
-        super(entity, property, thenActions, elseActions);
+    public MultipleCondition(String entity, Property property, List<Action> thenActions, List<Action> elseActions, List<Condition> conditions, String logical, SecondaryEntity secondaryEntity) {
+        super(entity, property, thenActions, elseActions, secondaryEntity);
         this.conditions = conditions;
         this.logical = logical;
     }
 
     @Override
-    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env)throws SimulationException {
+    public Boolean isTrue(EntityInstance entityInstance, EnvironmentInstance env, Context context)throws SimulationException {
         if(logical.equals(AND)) {
             for(Condition c : conditions) {
-                if(!c.isTrue(entityInstance, env)) return false;
+                if(!c.isTrue(entityInstance, env, context)) return false;
             }
             return true;
         }
         else if(logical.equals(OR)) {
             for(Condition c : conditions) {
-                if(c.isTrue(entityInstance, env)) return true;
+                if(c.isTrue(entityInstance, env, context)) {
+                    System.out.println("True");
+                    return true;
+                }
             }
             return false;
         }

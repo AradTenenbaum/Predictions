@@ -20,7 +20,7 @@ public class Proximity extends Action {
     private List<Action> actions;
 
     public Proximity(String entity, String targetEntity, String envDepth, List<Action> actions) {
-        super(ActionType.PROXIMITY, entity);
+        super(ActionType.PROXIMITY, entity, null);
         this.targetEntity = targetEntity;
         this.envDepth = envDepth;
         this.actions = actions;

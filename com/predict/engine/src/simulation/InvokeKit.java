@@ -40,6 +40,17 @@ public class InvokeKit {
         this.context = context;
     }
 
+    public InvokeKit(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid, List<EntityInstance> toCreate, int ticks, Context context) {
+        this.entityInstance = entityInstance;
+        this.env = env;
+        this.entities = entities;
+        this.world = world;
+        this.grid = grid;
+        this.toCreate = toCreate;
+        this.ticks = ticks;
+        this.context = context;
+    }
+
     public Context getContext() {
         return context;
     }
