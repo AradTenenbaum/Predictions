@@ -1,5 +1,7 @@
 package utils.func;
 
+import def.PropertyType;
+
 public class Convert {
     public static Double stringToDouble(String value) {
         try {
@@ -21,5 +23,16 @@ public class Convert {
 
     public static Boolean stringToBoolean(String value) {
         return (value.equals("true") || value.equals("false") ? (value.equals("true")) : null);
+    }
+
+    public static Object stringToType(String value, String type) {
+        if(PropertyType.isDecimal(type)) {
+            return stringToInteger(value);
+        } else if (PropertyType.isFloat(type)) {
+            return stringToDouble(value);
+        } else if (PropertyType.isBoolean(type)) {
+            return stringToBoolean(value);
+        }
+        return value;
     }
 }

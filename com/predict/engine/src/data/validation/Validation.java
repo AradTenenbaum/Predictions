@@ -1,9 +1,7 @@
 package data.validation;
 
-import def.Entity;
-import def.Environment;
-import def.Function;
-import def.PropertyType;
+import def.*;
+import ins.PropertyInstance;
 import utils.exception.ValidationException;
 
 import java.util.Map;
@@ -199,5 +197,13 @@ public class Validation {
         if(!entities.get(entity).getProperties().get(property).getType().equals(PropertyType.DECIMAL) && !entities.get(entity).getProperties().get(property).getType().equals(PropertyType.FLOAT))
             throw new ValidationException("'" + property+"' from '"+entity+ "' should be decimal/float for this action");
     }
+
+    public static void checkPropValid(Property prop, String value) throws ValidationException {
+        isValueFromType(prop.getType(), value);
+        if(prop.getRange() != null) {
+            isValidByRange(value, prop.getRange().getFrom(), prop.getRange().getTo());
+        }
+    }
+
 
 }

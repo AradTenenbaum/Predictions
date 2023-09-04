@@ -38,6 +38,6 @@
             </StackPane>
          </children>
       </GridPane>
-      <Pane fx:id="placeholder" style="-fx-background-color: blue;" VBox.vgrow="ALWAYS" />
+      <Pane fx:id="placeholder" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>
