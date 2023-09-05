@@ -25,7 +25,7 @@
                         <ProgressBar fx:id="progressBar" prefHeight="23.0" prefWidth="348.0" progress="0.0" BorderPane.alignment="CENTER" />
                      </bottom>
                      <right>
-                        <Button fx:id="rerunBtn" mnemonicParsing="false" text="Rerun" BorderPane.alignment="CENTER" />
+                        <Button fx:id="rerunBtn" mnemonicParsing="false" onAction="#rerunSimulation" text="Rerun" BorderPane.alignment="CENTER" />
                      </right>
                      <left>
                         <VBox prefHeight="0.0" prefWidth="100.0" BorderPane.alignment="CENTER">
@@ -37,12 +37,12 @@
                               </StackPane>
                               <StackPane VBox.vgrow="ALWAYS">
                                  <children>
-                                    <Button fx:id="pauseBtn" mnemonicParsing="false" text="Pause" />
+                                    <Button fx:id="pauseBtn" mnemonicParsing="false" onAction="#pauseCurrentTask" text="Pause" />
                                  </children>
                               </StackPane>
                               <StackPane VBox.vgrow="ALWAYS">
                                  <children>
-                                    <Button fx:id="playBtn" mnemonicParsing="false" text="Play" />
+                                    <Button fx:id="playBtn" mnemonicParsing="false" onAction="#playCurrentTask" text="Play" />
                                  </children>
                               </StackPane>
                            </children>

@@ -18,6 +18,7 @@ public class TasksManager {
     private Consumer<Long> runtimeConsumer;
     private Consumer<Integer> ticksConsumer;
     private Consumer<Long> aliveEntitiesConsumer;
+    private Consumer<Double> progressConsumer;
 
     public TasksManager(Manager manager) {
         executorService = Executors.newFixedThreadPool(manager.getThreadsNumber());
@@ -37,6 +38,18 @@ public class TasksManager {
         this.aliveEntitiesConsumer = aliveEntitiesConsumer;
     }
 
+    public void setProgressConsumer(Consumer<Double> progressConsumer) {
+        this.progressConsumer = progressConsumer;
+    }
+
+    public void setConsumers(Consumer<Long> runtimeConsumer, Consumer<Integer> ticksConsumer, Consumer<Long> aliveEntitiesConsumer, Consumer<Double> progressConsumer) {
+        setRuntimeConsumer(runtimeConsumer);
+        setTicksConsumer(ticksConsumer);
+        setAliveEntitiesConsumer(aliveEntitiesConsumer);
+        setProgressConsumer(progressConsumer);
+        tasks.forEach(runSimulationTask -> runSimulationTask.updateConsumers(runtimeConsumer, ticksConsumer, aliveEntitiesConsumer, progressConsumer));
+    }
+
     public void runAll() {
         tasks.forEach(booleanTask -> {
             executorService.submit(booleanTask);
@@ -44,7 +57,7 @@ public class TasksManager {
     }
 
     public void runOne() throws SimulationException {
-        RunSimulationTask newTask = new RunSimulationTask(manager.generateSimulation(), runtimeConsumer, ticksConsumer, aliveEntitiesConsumer);
+        RunSimulationTask newTask = new RunSimulationTask(manager.generateSimulation(), runtimeConsumer, ticksConsumer, aliveEntitiesConsumer, progressConsumer);
         this.tasks.add(newTask);
         executorService.submit(newTask);
     }

@@ -35,6 +35,10 @@ public class Manager implements Serializable {
         this.simulations = new ArrayList<>();
     }
 
+    public void setEnvironmentInstance(EnvironmentInstance environmentInstance) {
+        this.environmentInstance = new EnvironmentInstanceImpl(environmentInstance);
+    }
+
     public void setEnvVar(String property, String value) {
         Object fixedValue = value;
         try {
@@ -89,6 +93,7 @@ public class Manager implements Serializable {
 
         Simulation s = new Simulation(entities, sharedWorld, currentWorld, env, grid);
         simulations.add(s);
+        clearEnv();
 
         return s;
     }

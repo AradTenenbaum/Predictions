@@ -150,6 +150,7 @@ public class ExecutionController implements Initializable {
             ResultController resultController = loader.getController();
             resultController.setManager(manager);
             resultController.setTasksManager(tasksManager);
+            resultController.setPlaceholder(placeholder);
             tasksManager.runOne();
             resultController.setDisplay();
             helpers.fitParent(placeholder, component);

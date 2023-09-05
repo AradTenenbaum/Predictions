@@ -81,6 +81,7 @@ public class MainController {
             ResultController resultController = loader.getController();
             resultController.setManager(manager);
             resultController.setTasksManager(tasksManager);
+            resultController.setPlaceholder(placeholder);
             resultController.setDisplay();
             helpers.fitParent(placeholder, component);
 

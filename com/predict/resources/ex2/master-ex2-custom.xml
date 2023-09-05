@@ -46,7 +46,7 @@
 				<PRD-property type="float">
 					<PRD-name>p1</PRD-name>
 					<PRD-range from="0" to="100"/>
-					<PRD-value random-initialize="true"/>
+					<PRD-value random-initialize="false" init="0"/>
 				</PRD-property>
 				<PRD-property type="float">
 					<PRD-name>p2</PRD-name>
@@ -75,11 +75,11 @@
 				<PRD-action type="condition" entity="ent-1">
 					<PRD-secondary-entity entity="ent-2">
 						<PRD-selection count="4">
-							<PRD-condition singularity="single" entity="ent-2" property="p1" operator="bt" value="50"/>
+							<PRD-condition singularity="single" entity="ent-2" property="p1" operator="bt" value="4"/>
 						</PRD-selection>
 					</PRD-secondary-entity>
 					<PRD-condition singularity="multiple" logical="or">
-						<PRD-condition singularity="single" entity="ent-1" property="ticks(ent-1.p1)" operator="bt" value="20"/>
+						<PRD-condition singularity="single" entity="ent-1" property="ticks(ent-1.p1)" operator="bt" value="4"/>
 						<PRD-condition singularity="single" entity="ent-2" property="p2" operator="lt" value="3"/>
 						<PRD-condition singularity="multiple" logical="and">
 							<PRD-condition singularity="single" entity="ent-1" property="p4" operator="!=" value="nothing"/>
@@ -112,5 +112,7 @@
 	</PRD-rules>
 	<PRD-termination>
 		<PRD-by-user />
+		<PRD-by-ticks count="1000000"/>
+		<PRD-by-second count="10"/>
 	</PRD-termination>
 </PRD-world>

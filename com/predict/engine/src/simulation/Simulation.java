@@ -65,15 +65,25 @@ public class Simulation implements Serializable {
 
     public void checkStop() {
         Termination termination = world.getTermination();
-        if(!termination.isByUser()) {
-            long duration = 1000L *termination.getSeconds();
-            if(termination.getTicks() != -1 && ticks > termination.getTicks()) {
-                stop();
-            }
-            else if(termination.getSeconds() != -1 && runTime > duration) {
-                stop();
-            }
+        long duration = 1000L *termination.getSeconds();
+        if(termination.getTicks() != -1 && ticks > termination.getTicks()) {
+            stop();
         }
+        else if(termination.getSeconds() != -1 && runTime > duration) {
+            stop();
+        }
+    }
+
+    public double getProgress() {
+        if(isStopped()) return 1;
+        Termination termination = world.getTermination();
+        if(termination.getTicks() != -1) {
+            return ((double) ticks /termination.getTicks());
+        }
+        else if(termination.getSeconds() != -1) {
+            return ((double) getRunTime() /termination.getSeconds());
+        }
+        return 0;
     }
 
     public boolean isStopped() {return this.status==STATUS.STOPPED;}
@@ -94,6 +104,10 @@ public class Simulation implements Serializable {
             num.addAndGet(entityInstances.stream().filter(EntityInstance::getAlive).count());
         });
         return num.get();
+    }
+
+    public EnvironmentInstance getEnvironmentInstance() {
+        return environmentInstance;
     }
 
     public void setGrid(Grid grid) {
@@ -177,6 +191,10 @@ public class Simulation implements Serializable {
 
             checkStop();
         }
+    }
+
+    public void setPopulations() {
+        //TODO
     }
 
     public UUID getId() {
