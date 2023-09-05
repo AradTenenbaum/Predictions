@@ -34,9 +34,6 @@ public class SingleCondition extends Condition {
         String val = Function.getFuncInput(value, property.getType(), env, context);
         Object propValue = Function.getPropertyIfFunction(property.getName(), currEntityInstance);
 
-        System.out.println("Invoke condition: " + this);
-        System.out.println("Instance: " + currEntityInstance);
-
         switch (operator) {
             case BT:
                 if(PropertyType.isTypeNumber(property.getType())) {

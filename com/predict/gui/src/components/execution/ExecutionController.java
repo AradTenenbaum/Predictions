@@ -1,18 +1,31 @@
 package components.execution;
 
+import components.results.ResultController;
 import data.dto.WorldDto;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import logic.TasksManager;
+import logic.tasks.RunSimulationTask;
 import simulation.Manager;
+import utils.Helpers;
 import utils.exception.SimulationException;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ExecutionController implements Initializable {
 
@@ -27,12 +40,26 @@ public class ExecutionController implements Initializable {
 
     @FXML
     private Button startBtn;
-
     private Manager manager;
+    private Pane placeholder;
+    private TasksManager tasksManager;
+    private Helpers helpers;
+
+    public ExecutionController() {
+        helpers = new Helpers();
+    }
 
     public void setManager(Manager manager) {
         this.manager = manager;
         setDisplay();
+    }
+
+    public void setTasksManager(TasksManager tasksManager) {
+        this.tasksManager = tasksManager;
+    }
+
+    public void setPlaceholder(Pane placeholder) {
+        this.placeholder = placeholder;
     }
 
     public void setDisplay() {
@@ -116,11 +143,34 @@ public class ExecutionController implements Initializable {
         });
     }
 
+    public void loadResults() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(Helpers.RESULTS_PATH));
+            Pane component = loader.load();
+            ResultController resultController = loader.getController();
+            resultController.setManager(manager);
+            resultController.setTasksManager(tasksManager);
+            tasksManager.runOne();
+            resultController.setDisplay();
+            helpers.fitParent(placeholder, component);
+
+            HBox p = (HBox) component.getChildren().get(0);
+            p.prefWidthProperty().bind(component.widthProperty());
+            p.prefHeightProperty().bind(component.heightProperty());
+
+            placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     void startSimulation(ActionEvent event) {
         try {
-            manager.runSimulation();
-        } catch (SimulationException e) {
+            loadResults();
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }

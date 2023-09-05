@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Termination implements Serializable {
     public static enum REASONS {
-        TICKS, SECONDS
+        TICKS, SECONDS, USER
     }
     private int ticks;
     private int seconds;

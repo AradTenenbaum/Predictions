@@ -25,6 +25,10 @@ public class World implements Serializable {
         this.grid = grid;
     }
 
+    public int getThreadPoolCount() {
+        return threadPoolCount;
+    }
+
     public Grid getGrid() {
         return grid;
     }

@@ -1,5 +1,7 @@
 package ins;
 
+import def.Property;
+
 import java.io.Serializable;
 
 public class PropertyInstance implements Serializable {
@@ -26,6 +28,13 @@ public class PropertyInstance implements Serializable {
         this.value = 0;
         this.lastChangedTick = 0;
         this.isRandom = true;
+    }
+
+    public PropertyInstance(PropertyInstance other) {
+        this.type = other.type;
+        this.value = other.value;
+        this.lastChangedTick = other.lastChangedTick;
+        this.isRandom = other.isRandom;
     }
 
     public void setValue(Object value) {

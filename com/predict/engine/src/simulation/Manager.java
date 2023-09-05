@@ -17,6 +17,7 @@ import utils.object.Range;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Manager implements Serializable {
@@ -25,11 +26,13 @@ public class Manager implements Serializable {
     private Boolean isValidWorld;
     private History history;
     private EnvironmentInstance environmentInstance;
+    private List<Simulation> simulations;
 
     public Manager() {
         this.isValidWorld = false;
         this.history = new History();
         this.environmentInstance = new EnvironmentInstanceImpl();
+        this.simulations = new ArrayList<>();
     }
 
     public void setEnvVar(String property, String value) {
@@ -51,17 +54,56 @@ public class Manager implements Serializable {
         return environmentInstance.getProperty(property).getValue().toString();
     }
 
-    public void setPopulations(Map<String, Integer> populations) {
-        currentWorld.getEntities().forEach((s, entity) -> {
-            if(populations.containsKey(s)) {
-                entity.setPopulation(populations.get(s));
+    public Simulation generateSimulation() throws SimulationException {
+        EnvironmentInstance env = environmentInstance;
+        sharedWorld.getEnvironment().getProperties().forEach(propertyDto -> {
+            if(env.getProperty(propertyDto.getName()).isRandom()) {
+                Object value = RandomGenerator.getRandom(propertyDto.getType(), propertyDto.getRange());
+                env.setProperty(propertyDto.getName(), value);
             }
         });
+
+        if(currentWorld == null && !isValidWorld) {
+            throw new SimulationException("no valid file was loaded. please load a file to run this action");
+        }
+
+        // Generate a map of entity name to list of instances
+        Map<String, List<EntityInstance>> entities = new HashMap<>(currentWorld.getEntities().size());
+        currentWorld.getEntities().forEach((s, entity) -> {
+            entities.put(s, new ArrayList<>(entity.getPopulation()));
+        });
+
+        // Generate instances for each entity
+        entities.forEach((entityName, entityInstances) -> {
+            for (int i = 0; i < currentWorld.getEntities().get(entityName).getPopulation(); i++) {
+                Map<String, PropertyInstance> properties = new HashMap<>();
+                currentWorld.getEntities().get(entityName).getProperties().forEach((propertyName, property) -> {
+                    properties.put(propertyName, new PropertyInstance(property.getType(), property.generateValue()));
+                });
+                entityInstances.add(new EntityInstance(entityName, properties));
+            }
+        });
+
+        // Create the grid
+        Grid grid = currentWorld.getGrid().generateGrid(entities);
+
+        Simulation s = new Simulation(entities, sharedWorld, currentWorld, env, grid);
+        simulations.add(s);
+
+        return s;
     }
 
     public void setPopulation(String entity, int number) {
-        currentWorld.getEntities().get(entity).setPopulation(number);
-        sharedWorld = new WorldDto(currentWorld);
+        AtomicInteger populationSum = new AtomicInteger(number);
+        currentWorld.getEntities().forEach((s, entity1) -> {
+            if(!s.equals(entity)) {
+                populationSum.addAndGet(entity1.getPopulation());
+            }
+        });
+        if(!(populationSum.get() > currentWorld.getGrid().getColumns()*currentWorld.getGrid().getRows())) {
+            currentWorld.getEntities().get(entity).setPopulation(number);
+            sharedWorld = new WorldDto(currentWorld);
+        }
     }
 
     public void setCurrentWorld(World currentWorld) {
@@ -105,7 +147,21 @@ public class Manager implements Serializable {
         return history.getSimulationById(id);
     }
 
-    public Simulation runSimulation() throws SimulationException, RuntimeException {
+    public boolean stopSimulation(Termination t, int ticks, long startTime, long duration, boolean cancelled) {
+        if(t.isByUser()) return cancelled;
+        else {
+            boolean res = false;
+            if(t.getTicks() > 0) res = ticks > t.getTicks();
+            else if(t.getSeconds() > 0) res = (System.currentTimeMillis() - startTime > duration);
+            return res;
+        }
+    }
+
+    public int getThreadsNumber() {
+        return currentWorld.getThreadPoolCount();
+    }
+
+    public Simulation runSimulation(boolean cancelled) throws SimulationException, RuntimeException {
         EnvironmentInstance env = environmentInstance;
         sharedWorld.getEnvironment().getProperties().forEach(propertyDto -> {
             if(env.getProperty(propertyDto.getName()).isRandom()) {
@@ -140,13 +196,17 @@ public class Manager implements Serializable {
 
         List<EntityInstance> toCreate = new ArrayList<>();
 
+        Simulation s = new Simulation(entities, sharedWorld, currentWorld, env, grid);
+
         int ticks = 0;
         long startTime = System.currentTimeMillis();
         long duration = 1000L *currentWorld.getTermination().getSeconds();
-        while (ticks < currentWorld.getTermination().getTicks() && (System.currentTimeMillis() - startTime < duration)) {
+
+        while (!stopSimulation(currentWorld.getTermination(), ticks, startTime, duration, cancelled)) {
+            // logs
+            System.out.println("Simulation: " + s.getId() + " tick: " + ticks);
 
             int finalTicks = ticks;
-            // TODO: check if the condition action needs to work without entity
             currentWorld.getRules().forEach(rule -> {
                 if(rule.isActive(finalTicks)) {
                     rule.getActions().forEach(action -> {
@@ -205,7 +265,7 @@ public class Manager implements Serializable {
             toCreate.clear();
 
             // move all entities
-            entities.forEach(((s, entityInstances) -> {
+            entities.forEach(((entityName, entityInstances) -> {
                 entityInstances.forEach(entityInstance -> {
                     if(entityInstance.getAlive()) entityInstance.move(grid);
                     else {
@@ -217,15 +277,13 @@ public class Manager implements Serializable {
         }
 
         // Testing simulation
-        entities.forEach(((s, entityInstances) -> {
-            System.out.println(s + ": " + entityInstances.stream().filter(EntityInstance::getAlive).count());
+        entities.forEach(((entityName, entityInstances) -> {
+            System.out.println(entityName + ": " + entityInstances.stream().filter(EntityInstance::getAlive).count());
             entityInstances.forEach(entityInstance -> {
                 System.out.println(entityInstance.toString());
             });
         }));
         // Testing simulation
-
-        Simulation s = new Simulation(entities, sharedWorld);
 
         if(!(ticks < currentWorld.getTermination().getTicks())) {
             s.setTerminationReason(Termination.REASONS.TICKS);

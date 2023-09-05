@@ -12,6 +12,13 @@ public class EnvironmentInstanceImpl implements EnvironmentInstance {
         this.properties = new HashMap<>();
     }
 
+    public EnvironmentInstanceImpl(EnvironmentInstance environmentInstance) {
+        this.properties = new HashMap<>();
+        environmentInstance.getProperties().forEach((s, propertyInstance) -> {
+            this.properties.put(s, new PropertyInstance(propertyInstance));
+        });
+    }
+
     @Override
     public void addRandomProperty(String name, String type) {
         properties.put(name, new PropertyInstance(type));

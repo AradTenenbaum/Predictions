@@ -2,6 +2,7 @@ package components.main;
 
 import components.details.DetailsController;
 import components.execution.ExecutionController;
+import components.results.ResultController;
 import data.dto.WorldDto;
 import def.*;
 import javafx.beans.binding.Bindings;
@@ -21,6 +22,7 @@ import java.io.IOException;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import logic.TasksManager;
 import simulation.Manager;
 import utils.Helpers;
 
@@ -37,6 +39,8 @@ public class MainController {
     private SimpleBooleanProperty isFileLoaded;
     private Stage primaryStage;
     private Manager manager;
+    private TasksManager tasksManager;
+
 
     @FXML
     private void showDetails() {
@@ -50,7 +54,7 @@ public class MainController {
 
     @FXML
     private void showResults() {
-        helpers.loadComponent(Helpers.RESULTS_PATH, placeholder);
+        loadResults(Helpers.RESULTS_PATH, placeholder);
     }
 
     public MainController() {
@@ -68,6 +72,28 @@ public class MainController {
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+    }
+
+    public void loadResults(String fxmlFile, Pane placeholder) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            Pane component = loader.load();
+            ResultController resultController = loader.getController();
+            resultController.setManager(manager);
+            resultController.setTasksManager(tasksManager);
+            resultController.setDisplay();
+            helpers.fitParent(placeholder, component);
+
+            HBox p = (HBox) component.getChildren().get(0);
+            p.prefWidthProperty().bind(component.widthProperty());
+            p.prefHeightProperty().bind(component.heightProperty());
+
+            placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void loadDetails(String fxmlFile, Pane placeholder, WorldDto worldDto) {
@@ -94,6 +120,8 @@ public class MainController {
             Pane component = loader.load();
             ExecutionController executionController = loader.getController();
             executionController.setManager(manager);
+            executionController.setTasksManager(tasksManager);
+            executionController.setPlaceholder(placeholder);
             helpers.fitParent(placeholder, component);
 
             VBox p = (VBox) component.getChildren().get(0);
@@ -119,6 +147,7 @@ public class MainController {
         String absolutePath = selectedFile.getAbsolutePath();
         try {
             data.source.File.fetchDataFromFile(absolutePath, manager);
+            tasksManager = new TasksManager(manager);
             loadDetails(Helpers.DETAILS_PATH, placeholder,manager.getSharedWorld());
             isFileLoaded.set(true);
             selectedFileProperty.set(absolutePath);
