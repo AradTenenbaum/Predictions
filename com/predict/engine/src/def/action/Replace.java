@@ -5,6 +5,7 @@ import ins.EntityInstance;
 import ins.PropertyInstance;
 import ins.environment.EnvironmentInstance;
 import simulation.InvokeKit;
+import simulation.statistics.Statistics;
 import utils.exception.SimulationException;
 import utils.object.Grid;
 
@@ -29,13 +30,15 @@ public class Replace extends Action {
         EntityInstance entityInstance = invokeKit.getEntityInstance();
         World world = invokeKit.getWorld();
         Grid grid = invokeKit.getGrid();
+        Statistics statistics = invokeKit.getStatistics();
+        int lastTick = invokeKit.getTicks();
         List<EntityInstance> toCreate = invokeKit.getToCreate();
 
         entityInstance.kill();
         Map<String, PropertyInstance> properties = new HashMap<>();
         if(mode.equals(SCRATCH)) {
             world.getEntities().get(createEntity).getProperties().forEach((propertyName, property) -> {
-                properties.put(propertyName, new PropertyInstance(property.getType(), property.generateValue()));
+                properties.put(propertyName, new PropertyInstance(property.getType(), property.generateValue(),lastTick, statistics.getEntityStatistics().get(createEntity).getProperty(propertyName)));
             });
         } else if(mode.equals(DERIVED)) {
             world.getEntities().get(createEntity).getProperties().forEach((propertyName, property) -> {
@@ -43,7 +46,7 @@ public class Replace extends Action {
                     properties.put(propertyName, entityInstance.getProperties().get(propertyName));
                 }
                 else {
-                    properties.put(propertyName, new PropertyInstance(property.getType(), property.generateValue()));
+                    properties.put(propertyName, new PropertyInstance(property.getType(), property.generateValue(),lastTick, statistics.getEntityStatistics().get(createEntity).getProperty(propertyName)));
                 }
             });
         }

@@ -1,6 +1,7 @@
 package ins;
 
 import def.Property;
+import simulation.statistics.PropertyStatistics;
 
 import java.io.Serializable;
 
@@ -9,18 +10,20 @@ public class PropertyInstance implements Serializable {
     private Object value;
     private int lastChangedTick = 0;
     private boolean isRandom;
+    private PropertyStatistics propertyStatistics;
 
-    public PropertyInstance(String type, Object value) {
-        this.type = type;
-        this.value = value;
-        this.isRandom = false;
-    }
+//    public PropertyInstance(String type, Object value) {
+//        this.type = type;
+//        this.value = value;
+//        this.isRandom = false;
+//    }
 
-    public PropertyInstance(String type, Object value, int lastChangedTick) {
+    public PropertyInstance(String type, Object value, int lastChangedTick, PropertyStatistics propertyStatistics) {
         this.type = type;
         this.value = value;
         this.lastChangedTick = lastChangedTick;
         this.isRandom = false;
+        this.propertyStatistics = propertyStatistics;
     }
 
     public PropertyInstance(String type) {
@@ -28,6 +31,14 @@ public class PropertyInstance implements Serializable {
         this.value = 0;
         this.lastChangedTick = 0;
         this.isRandom = true;
+    }
+
+    public void setPropertyStatistics(PropertyStatistics propertyStatistics) {
+        this.propertyStatistics = propertyStatistics;
+    }
+
+    public PropertyStatistics getPropertyStatistics() {
+        return propertyStatistics;
     }
 
     public PropertyInstance(PropertyInstance other) {

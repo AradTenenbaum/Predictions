@@ -3,10 +3,13 @@ package logic;
 import javafx.concurrent.Task;
 import logic.tasks.RunSimulationTask;
 import simulation.Manager;
+import utils.SimpleItem;
 import utils.exception.SimulationException;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -17,7 +20,7 @@ public class TasksManager {
     private Manager manager;
     private Consumer<Long> runtimeConsumer;
     private Consumer<Integer> ticksConsumer;
-    private Consumer<Long> aliveEntitiesConsumer;
+    private List<SimpleItem> tableItems;
     private Consumer<Double> progressConsumer;
 
     public TasksManager(Manager manager) {
@@ -34,20 +37,24 @@ public class TasksManager {
         this.ticksConsumer = ticksConsumer;
     }
 
-    public void setAliveEntitiesConsumer(Consumer<Long> aliveEntitiesConsumer) {
-        this.aliveEntitiesConsumer = aliveEntitiesConsumer;
+    public void setTableItems(List<SimpleItem> tableItems) {
+        this.tableItems = tableItems;
     }
 
     public void setProgressConsumer(Consumer<Double> progressConsumer) {
         this.progressConsumer = progressConsumer;
     }
 
-    public void setConsumers(Consumer<Long> runtimeConsumer, Consumer<Integer> ticksConsumer, Consumer<Long> aliveEntitiesConsumer, Consumer<Double> progressConsumer) {
+    public void setConsumers(Consumer<Long> runtimeConsumer, Consumer<Integer> ticksConsumer, Consumer<Double> progressConsumer, List<SimpleItem> tableItems) {
         setRuntimeConsumer(runtimeConsumer);
         setTicksConsumer(ticksConsumer);
-        setAliveEntitiesConsumer(aliveEntitiesConsumer);
         setProgressConsumer(progressConsumer);
-        tasks.forEach(runSimulationTask -> runSimulationTask.updateConsumers(runtimeConsumer, ticksConsumer, aliveEntitiesConsumer, progressConsumer));
+        setTableItems(tableItems);
+        tasks.forEach(runSimulationTask -> runSimulationTask.updateConsumers(runtimeConsumer, ticksConsumer, progressConsumer, tableItems));
+    }
+
+    public Optional<RunSimulationTask> getTaskBySimulationId(String simulationId) {
+        return tasks.stream().filter(runSimulationTask -> runSimulationTask.getSimulationId().equals(simulationId)).findFirst();
     }
 
     public void runAll() {
@@ -57,12 +64,22 @@ public class TasksManager {
     }
 
     public void runOne() throws SimulationException {
-        RunSimulationTask newTask = new RunSimulationTask(manager.generateSimulation(), runtimeConsumer, ticksConsumer, aliveEntitiesConsumer, progressConsumer);
+        RunSimulationTask newTask = new RunSimulationTask(manager.generateSimulation(), runtimeConsumer, ticksConsumer, progressConsumer, tableItems);
         this.tasks.add(newTask);
         executorService.submit(newTask);
     }
 
     public List<RunSimulationTask> getTasks() {
         return tasks;
+    }
+
+    public void clear() {
+        tasks.forEach(runSimulationTask -> runSimulationTask.cancel());
+        executorService.shutdown();
+        tasks.clear();
+    }
+
+    public void hideAll() {
+        tasks.forEach(RunSimulationTask::hide);
     }
 }

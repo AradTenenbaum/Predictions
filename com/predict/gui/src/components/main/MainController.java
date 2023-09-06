@@ -148,6 +148,9 @@ public class MainController {
         String absolutePath = selectedFile.getAbsolutePath();
         try {
             data.source.File.fetchDataFromFile(absolutePath, manager);
+            if(tasksManager != null) {
+                tasksManager.clear();
+            }
             tasksManager = new TasksManager(manager);
             loadDetails(Helpers.DETAILS_PATH, placeholder,manager.getSharedWorld());
             isFileLoaded.set(true);

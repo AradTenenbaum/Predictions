@@ -35,8 +35,23 @@ public class Manager implements Serializable {
         this.simulations = new ArrayList<>();
     }
 
-    public void setEnvironmentInstance(EnvironmentInstance environmentInstance) {
-        this.environmentInstance = new EnvironmentInstanceImpl(environmentInstance);
+    public void setEnvironmentInstance(EnvironmentInstance environmentInstance, Map<String, Integer> populations) {
+        this.environmentInstance = new EnvironmentInstanceImpl(environmentInstance, populations);
+    }
+
+    public void setPopulations(Map<String, Integer> entToPopulation) {
+        entToPopulation.forEach((entity, population) -> {
+            currentWorld.getEntities().get(entity).setPopulation(population);
+        });
+        updateWorldDto();
+    }
+
+    public void updateWorldDto() {
+        sharedWorld = new WorldDto(currentWorld);
+    }
+
+    public List<Simulation> getSimulations() {
+        return simulations;
     }
 
     public void setEnvVar(String property, String value) {
@@ -82,7 +97,7 @@ public class Manager implements Serializable {
             for (int i = 0; i < currentWorld.getEntities().get(entityName).getPopulation(); i++) {
                 Map<String, PropertyInstance> properties = new HashMap<>();
                 currentWorld.getEntities().get(entityName).getProperties().forEach((propertyName, property) -> {
-                    properties.put(propertyName, new PropertyInstance(property.getType(), property.generateValue()));
+                    properties.put(propertyName, new PropertyInstance(property.getType(), property.generateValue(), 0, null));
                 });
                 entityInstances.add(new EntityInstance(entityName, properties));
             }
@@ -92,6 +107,14 @@ public class Manager implements Serializable {
         Grid grid = currentWorld.getGrid().generateGrid(entities);
 
         Simulation s = new Simulation(entities, sharedWorld, currentWorld, env, grid);
+        entities.forEach((s1, entityInstances) -> {
+            entityInstances.forEach(entityInstance -> {
+                entityInstance.getProperties().forEach((s2, propertyInstance) -> {
+                    propertyInstance.setPropertyStatistics(s.getStatistics().getEntity(s1).getProperty(s2));
+                });
+            });
+        });
+
         simulations.add(s);
         clearEnv();
 
@@ -107,7 +130,7 @@ public class Manager implements Serializable {
         });
         if(!(populationSum.get() > currentWorld.getGrid().getColumns()*currentWorld.getGrid().getRows())) {
             currentWorld.getEntities().get(entity).setPopulation(number);
-            sharedWorld = new WorldDto(currentWorld);
+            updateWorldDto();
         }
     }
 
@@ -124,7 +147,7 @@ public class Manager implements Serializable {
             currentWorld.getEntities().forEach((s, entity) -> {
                 entity.setPopulation(0);
             });
-            sharedWorld = new WorldDto(currentWorld);
+            updateWorldDto();
         }
     }
 
@@ -190,7 +213,7 @@ public class Manager implements Serializable {
             for (int i = 0; i < currentWorld.getEntities().get(entityName).getPopulation(); i++) {
                 Map<String, PropertyInstance> properties = new HashMap<>();
                 currentWorld.getEntities().get(entityName).getProperties().forEach((propertyName, property) -> {
-                    properties.put(propertyName, new PropertyInstance(property.getType(), property.generateValue()));
+                    properties.put(propertyName, new PropertyInstance(property.getType(), property.generateValue(), 0, null));
                 });
                 entityInstances.add(new EntityInstance(entityName, properties));
             }
@@ -234,7 +257,7 @@ public class Manager implements Serializable {
                                         if(action.getSecondaryEntity().get().isAll()) {
                                             secondaries.forEach(secEntity -> {
                                                 try {
-                                                    action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks, new Context(secEntity)));
+                                                    action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks, s.getStatistics(), new Context(secEntity)));
                                                 } catch (SimulationException e) {
                                                     throw new RuntimeException("An error occurred");
                                                 }
@@ -244,7 +267,7 @@ public class Manager implements Serializable {
                                                 for(int i = 0; i < action.getSecondaryEntity().get().getCount(); i++) {
                                                     EntityInstance randomSecEntity = secondaries.get(RandomGenerator.getInt(new Range(0, secondaries.size()-1)));
                                                     try {
-                                                        action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks, new Context(randomSecEntity)));
+                                                        action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks, s.getStatistics(), new Context(randomSecEntity)));
                                                     } catch (SimulationException e) {
                                                         throw new RuntimeException("An error occurred");
                                                     }
@@ -253,7 +276,7 @@ public class Manager implements Serializable {
                                         }
                                     }
                                     else {
-                                        action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks));
+                                        action.invoke(new InvokeKit(entityInstance, env, entities, currentWorld, grid, toCreate, finalTicks, s.getStatistics()));
                                     }
                                 }
                             } catch (SimulationException e) {

@@ -130,7 +130,7 @@ public class ExecutionController implements Initializable {
             if (event.getClickCount() == 1) {
                 String selectedItem = entitiesList.getSelectionModel().getSelectedItem();
 
-                setPopulationDialog(selectedItem);
+                if(selectedItem != null) setPopulationDialog(selectedItem);
             }
         });
 
@@ -138,7 +138,7 @@ public class ExecutionController implements Initializable {
             if (event.getClickCount() == 1) {
                 String selectedItem = envList.getSelectionModel().getSelectedItem();
 
-                setEnvDialog(selectedItem);
+                if(selectedItem != null) setEnvDialog(selectedItem);
             }
         });
     }

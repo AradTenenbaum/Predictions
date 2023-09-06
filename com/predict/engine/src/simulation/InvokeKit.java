@@ -3,6 +3,7 @@ package simulation;
 import def.World;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
+import simulation.statistics.Statistics;
 import utils.object.Grid;
 
 import java.util.List;
@@ -18,8 +19,9 @@ public class InvokeKit {
     private int ticks;
 
     private Context context;
+    Statistics statistics;
 
-    public InvokeKit(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid, List<EntityInstance> toCreate, int ticks) {
+    public InvokeKit(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid, List<EntityInstance> toCreate, int ticks, Statistics statistics) {
         this.entityInstance = entityInstance;
         this.env = env;
         this.entities = entities;
@@ -27,6 +29,7 @@ public class InvokeKit {
         this.grid = grid;
         this.toCreate = toCreate;
         this.ticks = ticks;
+        this.statistics = statistics;
     }
 
     public InvokeKit(InvokeKit oldIK, Context context) {
@@ -37,10 +40,15 @@ public class InvokeKit {
         this.grid = oldIK.getGrid();
         this.toCreate = oldIK.getToCreate();
         this.ticks = oldIK.getTicks();
+        this.statistics = oldIK.getStatistics();
         this.context = context;
     }
 
-    public InvokeKit(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid, List<EntityInstance> toCreate, int ticks, Context context) {
+    public Statistics getStatistics() {
+        return statistics;
+    }
+
+    public InvokeKit(EntityInstance entityInstance, EnvironmentInstance env, Map<String, List<EntityInstance>> entities, World world, Grid grid, List<EntityInstance> toCreate, int ticks, Statistics statistics, Context context) {
         this.entityInstance = entityInstance;
         this.env = env;
         this.entities = entities;
@@ -49,6 +57,7 @@ public class InvokeKit {
         this.toCreate = toCreate;
         this.ticks = ticks;
         this.context = context;
+        this.statistics = statistics;
     }
 
     public Context getContext() {

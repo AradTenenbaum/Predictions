@@ -1,11 +1,14 @@
 package logic.tasks;
 
+import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import simulation.Manager;
 import simulation.Simulation;
+import utils.SimpleItem;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -14,24 +17,24 @@ public class RunSimulationTask extends Task<Boolean> {
     private boolean isDisplayed;
     private Consumer<Long> runtimeConsumer;
     private Consumer<Integer> ticksConsumer;
-    private Consumer<Long> aliveEntitiesConsumer;
     private Consumer<Double> progressConsumer;
+    private List<SimpleItem> tableItems;
 
 
-    public RunSimulationTask(Simulation s, Consumer<Long> runtimeConsumer, Consumer<Integer> ticksConsumer, Consumer<Long> aliveEntitiesConsumer, Consumer<Double> progressConsumer) {
+    public RunSimulationTask(Simulation s, Consumer<Long> runtimeConsumer, Consumer<Integer> ticksConsumer, Consumer<Double> progressConsumer, List<SimpleItem> tableItems) {
         this.s = s;
         this.isDisplayed = false;
         this.runtimeConsumer = runtimeConsumer;
         this.ticksConsumer = ticksConsumer;
-        this.aliveEntitiesConsumer = aliveEntitiesConsumer;
         this.progressConsumer = progressConsumer;
+        this.tableItems = tableItems;
     }
 
-    public void updateConsumers(Consumer<Long> runtimeConsumer, Consumer<Integer> ticksConsumer, Consumer<Long> aliveEntitiesConsumer, Consumer<Double> progressConsumer) {
+    public void updateConsumers(Consumer<Long> runtimeConsumer, Consumer<Integer> ticksConsumer, Consumer<Double> progressConsumer, List<SimpleItem> tableItems) {
         this.runtimeConsumer = runtimeConsumer;
         this.ticksConsumer = ticksConsumer;
-        this.aliveEntitiesConsumer = aliveEntitiesConsumer;
         this.progressConsumer = progressConsumer;
+        this.tableItems = tableItems;
     }
 
     public EnvironmentInstance getEnv() {
@@ -60,12 +63,19 @@ public class RunSimulationTask extends Task<Boolean> {
 
     public void displayOnConsumers() {
         Platform.runLater(() -> {
-            runtimeConsumer.accept(s.getRunTime());
-            ticksConsumer.accept(s.getTicks());
-            aliveEntitiesConsumer.accept(s.getAliveEntities());
-            progressConsumer.accept(s.getProgress());
+            if(isDisplayed) {
+                runtimeConsumer.accept(s.getRunTime());
+                ticksConsumer.accept(s.getTicks());
+                progressConsumer.accept(s.getProgress());
+                tableItems.forEach(simpleItem -> {
+                    simpleItem.setSecond(
+                            String.valueOf(s.getEntities().get(simpleItem.getFirst().get()).stream().filter(EntityInstance::getAlive).count())
+                    );
+                });
+            }
         });
     }
+
 
     @Override
     protected Boolean call() {
@@ -73,7 +83,7 @@ public class RunSimulationTask extends Task<Boolean> {
         try {
             updateMessage("Start simulation");
             int loops = 0;
-            int setEvery = 10000;
+            int setEvery = 1000;
 
             while (!isCancelled()) {
                 s.runTick();

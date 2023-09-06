@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.statistics.StatisticsController">
+   <top>
+      <StackPane BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="title" text="Simulation: id">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+            </Label>
+         </children>
+      </StackPane>
+   </top>
+   <left>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <StackPane VBox.vgrow="ALWAYS">
+               <children>
+                  <Label fx:id="ticksLabel" text="Ticks:" />
+               </children>
+            </StackPane>
+            <StackPane VBox.vgrow="ALWAYS">
+               <children>
+                  <Label fx:id="runtimeLabel" text="Runtime:" />
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
+   </left>
+   <bottom>
+      <SplitPane dividerPositions="0.5" BorderPane.alignment="CENTER">
+         <items>
+            <TreeView fx:id="treeView" prefHeight="200.0" />
+            <TableView fx:id="valuesTable" prefHeight="200.0">
+              <columns>
+                <TableColumn fx:id="nameCol" prefWidth="147.0" text="Name" />
+                <TableColumn fx:id="valueCol" prefWidth="148.0" text="Value" />
+              </columns>
+            </TableView>
+         </items>
+      </SplitPane>
+   </bottom>
+   <center>
+      <StackPane fx:id="graphPlaceholder" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

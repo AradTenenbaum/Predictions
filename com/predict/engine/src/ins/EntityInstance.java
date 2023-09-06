@@ -1,5 +1,7 @@
 package ins;
 
+import simulation.statistics.PropertyStatistics;
+import simulation.statistics.Statistics;
 import utils.object.Grid;
 import utils.object.Position;
 
@@ -36,14 +38,11 @@ public class EntityInstance implements Serializable {
         setPosition(newPos);
     }
 
-    public void setProperty(String property, Object value) {
-        String type = properties.get(property).getType();
-        properties.put(property, new PropertyInstance(type, value));
-    }
-
     public void setProperty(String property, Object value, int lastChangedTick) {
         String type = properties.get(property).getType();
-        properties.put(property, new PropertyInstance(type, value, lastChangedTick));
+        PropertyStatistics propertyStatistics = properties.get(property).getPropertyStatistics();
+        propertyStatistics.addLastChangeTicks(lastChangedTick - properties.get(property).getLastChangedTick());
+        properties.put(property, new PropertyInstance(type, value, lastChangedTick, propertyStatistics));
     }
 
     public Object getPropertyValue(String property) {

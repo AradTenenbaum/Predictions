@@ -43,10 +43,10 @@ public class ActionController {
         });
         actionLabel.setText(currentAction.getType());
         nameCol.setCellValueFactory(
-                new PropertyValueFactory<SimpleItem, String>("first")
+                param -> param.getValue().getFirst()
         );
         valueCol.setCellValueFactory(
-                new PropertyValueFactory<SimpleItem, String>("second")
+                param -> param.getValue().getSecond()
         );
 
         final ObservableList<SimpleItem> data =

@@ -6,9 +6,11 @@ import def.World;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
 import ins.environment.EnvironmentInstanceImpl;
+import simulation.statistics.Statistics;
 import utils.exception.SimulationException;
 import utils.func.RandomGenerator;
 import utils.object.Grid;
+import utils.object.Point;
 import utils.object.Range;
 
 import java.io.Serializable;
@@ -30,6 +32,7 @@ public class Simulation implements Serializable {
     private STATUS status;
     private long runTime;
     private int ticks;
+    private Statistics statistics;
     public enum STATUS {
         RUN, PAUSED, STOPPED
     }
@@ -40,11 +43,22 @@ public class Simulation implements Serializable {
         this.runDate = new Date();
         this.worldDto = worldDto;
         this.world = world;
-        this.environmentInstance = new EnvironmentInstanceImpl(environmentInstance);
+        Map<String, Integer> populations = new HashMap<>();
+        this.statistics = new Statistics();
+        world.getEntities().forEach((s, entity) -> {
+            populations.put(s, entity.getPopulation());
+            statistics.addEntity(s);
+            entity.getProperties().forEach((s1, property) -> {
+                statistics.getEntity(s).addProperty(s1);
+            });
+            statistics.addPointToGraph(s, new Point(0, entity.getPopulation()));
+        });
+        this.environmentInstance = new EnvironmentInstanceImpl(environmentInstance, populations);
         this.status = STATUS.RUN;
         this.grid = grid;
         this.runTime = 0;
         this.ticks = 0;
+
     }
 
     public void pause() {
@@ -59,8 +73,27 @@ public class Simulation implements Serializable {
         }
     }
 
+    public Map<String, Integer> getPopulations() {
+        return environmentInstance.getPopulations();
+    }
+
+    public Statistics getStatistics() {
+        return statistics;
+    }
+
     public void stop() {
         this.status = STATUS.STOPPED;
+        entities.forEach((s, entityInstances) -> {
+            statistics.setEntityAliveAmount(s, (int) entityInstances.stream().filter(EntityInstance::getAlive).count());
+            statistics.setEntityDeadAmount(s, (int) entityInstances.stream().filter(entityInstance -> !entityInstance.getAlive()).count());
+
+            statistics.getEntity(s).getPropertyStatistics().forEach((s1, propertyStatistics) -> {
+                Map<Object, List<EntityInstance>> groupBy = entityInstances.stream().filter(EntityInstance::getAlive).collect(Collectors.groupingBy(entityInstance -> entityInstance.getPropertyValue(s1)));
+                groupBy.forEach((o, entityInstances1) -> {
+                    propertyStatistics.addEntAmountPerValue(o, entityInstances1.size());
+                });
+            });
+        });
     }
 
     public void checkStop() {
@@ -142,7 +175,7 @@ public class Simulation implements Serializable {
                                         if(action.getSecondaryEntity().get().isAll()) {
                                             secondaries.forEach(secEntity -> {
                                                 try {
-                                                    action.invoke(new InvokeKit(entityInstance, environmentInstance, entities, world, grid, toCreate, finalTicks, new Context(secEntity)));
+                                                    action.invoke(new InvokeKit(entityInstance, environmentInstance, entities, world, grid, toCreate, finalTicks, statistics, new Context(secEntity)));
                                                 } catch (SimulationException e) {
                                                     throw new RuntimeException("An error occurred");
                                                 }
@@ -152,7 +185,7 @@ public class Simulation implements Serializable {
                                                 for(int i = 0; i < action.getSecondaryEntity().get().getCount(); i++) {
                                                     EntityInstance randomSecEntity = secondaries.get(RandomGenerator.getInt(new Range(0, secondaries.size()-1)));
                                                     try {
-                                                        action.invoke(new InvokeKit(entityInstance, environmentInstance, entities, world, grid, toCreate, finalTicks, new Context(randomSecEntity)));
+                                                        action.invoke(new InvokeKit(entityInstance, environmentInstance, entities, world, grid, toCreate, finalTicks, statistics, new Context(randomSecEntity)));
                                                     } catch (SimulationException e) {
                                                         throw new RuntimeException("An error occurred");
                                                     }
@@ -161,7 +194,7 @@ public class Simulation implements Serializable {
                                         }
                                     }
                                     else {
-                                        action.invoke(new InvokeKit(entityInstance, environmentInstance, entities, world, grid, toCreate, finalTicks));
+                                        action.invoke(new InvokeKit(entityInstance, environmentInstance, entities, world, grid, toCreate, finalTicks, statistics));
                                     }
                                 }
                             } catch (SimulationException e) {
@@ -189,13 +222,15 @@ public class Simulation implements Serializable {
             ticks++;
             runTime += (System.currentTimeMillis()-startTime);
 
+            // Update statistics
+            entities.forEach((s, entityInstances) -> {
+                statistics.addPointToGraph(s, new Point(ticks, (int) entityInstances.stream().filter(EntityInstance::getAlive).count()));
+            });
+
             checkStop();
         }
     }
 
-    public void setPopulations() {
-        //TODO
-    }
 
     public UUID getId() {
         return id;

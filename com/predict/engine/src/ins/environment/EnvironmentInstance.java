@@ -10,4 +10,5 @@ public interface EnvironmentInstance {
     Map<String, PropertyInstance> getProperties();
     public void addRandomProperty(String name, String type);
     public boolean isRandomProp(String property);
+    public Map<String, Integer> getPopulations();
 }

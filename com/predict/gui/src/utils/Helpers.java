@@ -13,6 +13,8 @@ public class Helpers {
     public final static String DETAILS_PATH = COMPONENTS_PATH + "/details/details.fxml";
     public final static String EXECUTION_PATH = COMPONENTS_PATH + "/execution/execution.fxml";
     public final static String RESULTS_PATH = COMPONENTS_PATH + "/results/results.fxml";
+    public final static String STATISTICS_PATH = COMPONENTS_PATH + "/statistics/statistics.fxml";
+    public final static String RUNTIME_PATH = COMPONENTS_PATH + "/runtime/runtime.fxml";
     public final static String ENTITY_PATH = SIMULATION_PATH + "/entity/entity.fxml";
     public final static String ENV_PATH = SIMULATION_PATH + "/environment/environment.fxml";
     public final static String ACTION_PATH = SIMULATION_PATH + "/actions/action.fxml";

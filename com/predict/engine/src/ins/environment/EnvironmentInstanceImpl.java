@@ -7,15 +7,22 @@ import java.util.Map;
 
 public class EnvironmentInstanceImpl implements EnvironmentInstance {
     private Map<String, PropertyInstance> properties;
+    private Map<String, Integer> populations;
 
     public EnvironmentInstanceImpl() {
         this.properties = new HashMap<>();
+        this.populations = new HashMap<>();
     }
 
-    public EnvironmentInstanceImpl(EnvironmentInstance environmentInstance) {
+    public EnvironmentInstanceImpl(EnvironmentInstance environmentInstance, Map<String, Integer> populations) {
         this.properties = new HashMap<>();
         environmentInstance.getProperties().forEach((s, propertyInstance) -> {
             this.properties.put(s, new PropertyInstance(propertyInstance));
+        });
+
+        this.populations = new HashMap<>();
+        populations.forEach((s, integer) -> {
+            this.populations.put(s, integer);
         });
     }
 
@@ -42,5 +49,10 @@ public class EnvironmentInstanceImpl implements EnvironmentInstance {
     @Override
     public Map<String, PropertyInstance> getProperties() {
         return properties;
+    }
+
+    @Override
+    public Map<String, Integer> getPopulations() {
+        return populations;
     }
 }
