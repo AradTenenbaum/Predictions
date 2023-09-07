@@ -47,4 +47,12 @@ public class EntityStatistics {
     public void setDeadAmount(int deadAmount) {
         this.deadAmount = deadAmount;
     }
+
+    public int getAliveAmount() {
+        return aliveAmount;
+    }
+
+    public int getDeadAmount() {
+        return deadAmount;
+    }
 }

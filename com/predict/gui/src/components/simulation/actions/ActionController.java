@@ -49,12 +49,12 @@ public class ActionController {
                 param -> param.getValue().getSecond()
         );
 
-        final ObservableList<SimpleItem> data =
-                FXCollections.observableArrayList(
-                        simpleItems
-                );
+    final ObservableList<SimpleItem> data =
+            FXCollections.observableArrayList(
+                    simpleItems
+            );
 
-        detailsTable.getItems().addAll(data);
+    detailsTable.getItems().addAll(data);
 
     }
 

@@ -42,7 +42,7 @@
    <bottom>
       <SplitPane dividerPositions="0.5" BorderPane.alignment="CENTER">
          <items>
-            <TreeView fx:id="treeView" prefHeight="200.0" />
+            <TreeView fx:id="treeView" onContextMenuRequested="#selectItem" onMouseClicked="#selectItem" prefHeight="200.0" />
             <TableView fx:id="valuesTable" prefHeight="200.0">
               <columns>
                 <TableColumn fx:id="nameCol" prefWidth="147.0" text="Name" />

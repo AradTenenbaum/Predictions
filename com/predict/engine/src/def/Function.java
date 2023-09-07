@@ -50,7 +50,7 @@ public class Function {
         if(func != null) {
             String funcArg = Function.getFunctionContent(val);
             if(func.equals(Function.RANDOM)) val = "" + RandomGenerator.getRandom(type, new Range(0, Convert.stringToDouble(funcArg)));
-            else if(func.equals(Function.ENVIRONMENT)) val = (String) env.getProperty(funcArg).getValue();
+            else if(func.equals(Function.ENVIRONMENT)) val = env.getProperty(funcArg).getValue().toString();
             else if (func.equals(Function.EVALUATE)) {
                 if(context == null) {
                     throw new SimulationException("Out of context " + funcArg);

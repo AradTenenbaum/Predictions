@@ -1,6 +1,7 @@
 package simulation;
 
 import data.dto.WorldDto;
+import def.PropertyType;
 import def.Termination;
 import def.World;
 import ins.EntityInstance;
@@ -93,6 +94,13 @@ public class Simulation implements Serializable {
                     propertyStatistics.addEntAmountPerValue(o, entityInstances1.size());
                 });
             });
+
+            entityInstances.forEach(entityInstance -> entityInstance.getProperties().forEach((propertyName, propertyInstance) -> {
+                if(PropertyType.isTypeNumber(propertyInstance.getType())) {
+                    Double value = (propertyInstance.getValue() instanceof Integer ? ((Integer) propertyInstance.getValue()).doubleValue() : (Double) propertyInstance.getValue());
+                    statistics.getEntity(s).getPropertyStatistics().get(propertyName).addValue(value);
+                }
+            }));
         });
     }
 
