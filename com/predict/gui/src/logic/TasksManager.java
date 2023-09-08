@@ -7,15 +7,12 @@ import utils.SimpleItem;
 import utils.exception.SimulationException;
 
 import javax.swing.text.html.Option;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 public class TasksManager {
-    private List<RunSimulationTask> tasks;
+    private Queue<RunSimulationTask> tasks;
     private ExecutorService executorService;
     private Manager manager;
     private Consumer<Long> runtimeConsumer;
@@ -25,7 +22,7 @@ public class TasksManager {
 
     public TasksManager(Manager manager) {
         executorService = Executors.newFixedThreadPool(manager.getThreadsNumber());
-        this.tasks = new ArrayList<>();
+        this.tasks = new LinkedList<>();
         this.manager = manager;
     }
 
@@ -39,6 +36,10 @@ public class TasksManager {
 
     public void setTableItems(List<SimpleItem> tableItems) {
         this.tableItems = tableItems;
+    }
+
+    public Queue<RunSimulationTask> getTasks() {
+        return tasks;
     }
 
     public void setProgressConsumer(Consumer<Double> progressConsumer) {
@@ -67,10 +68,6 @@ public class TasksManager {
         RunSimulationTask newTask = new RunSimulationTask(manager.generateSimulation(), runtimeConsumer, ticksConsumer, progressConsumer, tableItems);
         this.tasks.add(newTask);
         executorService.submit(newTask);
-    }
-
-    public List<RunSimulationTask> getTasks() {
-        return tasks;
     }
 
     public void clear() {

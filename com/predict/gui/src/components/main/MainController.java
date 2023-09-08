@@ -8,9 +8,10 @@ import def.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -20,8 +21,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import logic.TasksManager;
 import simulation.Manager;
 import utils.Helpers;
@@ -133,6 +132,28 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    @FXML
+    void displayQueueManagement(ActionEvent event) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Simulations queue");
+
+        ListView<String> listView = new ListView<>();
+
+        tasksManager.getTasks().forEach(runSimulationTask -> {
+            String status = (runSimulationTask.isRunning() ? "Running" : (runSimulationTask.isCancelled() ? "Done" : "Waiting"));
+            listView.getItems().add(runSimulationTask.getSimulationId() + ": " + status);
+        });
+
+        VBox vbox = new VBox(listView);
+        dialog.getDialogPane().setContent(vbox);
+
+        dialog.getDialogPane().getButtonTypes().add(javafx.scene.control.ButtonType.OK);
+        dialog.setResultConverter(dialogButton -> null);
+
+        dialog.showAndWait();
     }
 
     @FXML
