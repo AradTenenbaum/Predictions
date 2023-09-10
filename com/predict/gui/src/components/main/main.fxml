@@ -28,9 +28,9 @@
             <Label id="mainLabel" alignment="CENTER" prefHeight="21.0" prefWidth="925.0" text="Predictions" GridPane.columnIndex="2" />
             <Button id="queueManagementBtn" fx:id="queueManagementBtn" mnemonicParsing="false" onAction="#displayQueueManagement" prefHeight="31.0" prefWidth="179.0" text="Queue Management" GridPane.columnIndex="4" GridPane.rowIndex="1" />
             <Button id="loadFileBtn" fx:id="loadFileBtn" mnemonicParsing="false" onAction="#openFileButtonAction" prefHeight="31.0" prefWidth="169.0" text="Load FIle" GridPane.rowIndex="1" />
-            <Button mnemonicParsing="false" onAction="#showDetails" text="Details" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Button mnemonicParsing="false" onAction="#showExecution" text="New Execution" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-            <Button mnemonicParsing="false" onAction="#showResults" text="Results" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <Button fx:id="detailsBtn" mnemonicParsing="false" onAction="#showDetails" text="Details" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Button fx:id="execBtn" mnemonicParsing="false" onAction="#showExecution" text="New Execution" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Button fx:id="resBtn" mnemonicParsing="false" onAction="#showResults" text="Results" GridPane.columnIndex="3" GridPane.rowIndex="2" />
             <StackPane prefHeight="150.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1">
                <children>
                   <Label id="filePathLabel" fx:id="filePathLabel" alignment="CENTER" prefHeight="21.0" prefWidth="578.0" text="No file loaded yet" textAlignment="CENTER" />

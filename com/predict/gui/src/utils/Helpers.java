@@ -1,6 +1,9 @@
 package utils;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -21,29 +24,17 @@ public class Helpers {
     public final static String GRID_PATH = SIMULATION_PATH + "/grid/grid.fxml";
     public final static String TERMINATION_PATH = SIMULATION_PATH + "/termination/termination.fxml";
 
+    public void openErrorDialog(String error) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Invalid option");
 
-    public void loadComponent(String fxmlFile, Pane placeholder) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
-            Pane component = loader.load();
-            fitParent(placeholder, component);
-            component.getChildren().forEach(node -> {
-                if (node instanceof SplitPane) {
-                    SplitPane p = (SplitPane) node;
-                    p.prefWidthProperty().bind(component.widthProperty());
-                    p.prefHeightProperty().bind(component.heightProperty());
-                } else if (node instanceof VBox) {
-                    VBox p = (VBox) node;
-                    p.prefWidthProperty().bind(component.widthProperty());
-                    p.prefHeightProperty().bind(component.heightProperty());
-                }
+        dialog.setHeaderText("Error:");
+        dialog.setContentText(error);
 
-            });
+        dialog.getDialogPane().getButtonTypes().add(javafx.scene.control.ButtonType.OK);
+        dialog.setResultConverter(dialogButton -> null);
 
-            placeholder.getChildren().setAll(component);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        dialog.showAndWait();
     }
 
     public void fitParent(Pane parent, Pane child) {

@@ -30,6 +30,12 @@ import javax.naming.Binding;
 public class MainController {
     @FXML Label filePathLabel;
     @FXML Button queueManagementBtn;
+    @FXML
+    private Button detailsBtn;
+    @FXML
+    private Button execBtn;
+    @FXML
+    private Button resBtn;
     @FXML Button loadFileBtn;
     @FXML Pane placeholder;
 
@@ -66,6 +72,10 @@ public class MainController {
     @FXML
     private void initialize() {
         filePathLabel.textProperty().bind(Bindings.when(isFileLoaded).then(selectedFileProperty).otherwise("File is not loaded"));
+        queueManagementBtn.disableProperty().bind(isFileLoaded.not());
+        detailsBtn.disableProperty().bind(isFileLoaded.not());
+        execBtn.disableProperty().bind(isFileLoaded.not());
+        resBtn.disableProperty().bind(isFileLoaded.not());
 //        showDetails();
     }
 
@@ -177,7 +187,7 @@ public class MainController {
             isFileLoaded.set(true);
             selectedFileProperty.set(absolutePath);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            helpers.openErrorDialog(e.getMessage());
         }
     }
 

@@ -205,5 +205,11 @@ public class Validation {
         }
     }
 
+    public static void isValidReplaceMode(String mode) throws ValidationException {
+        if(!mode.equals("scratch") && !mode.equals("derived")) {
+            throw new ValidationException("Mode " + mode + " is not valid");
+        }
+    }
+
 
 }

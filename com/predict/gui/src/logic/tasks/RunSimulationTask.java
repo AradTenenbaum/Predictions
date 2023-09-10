@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import simulation.Manager;
 import simulation.Simulation;
+import utils.Helpers;
 import utils.SimpleItem;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class RunSimulationTask extends Task<Boolean> {
     private Consumer<Integer> ticksConsumer;
     private Consumer<Double> progressConsumer;
     private List<SimpleItem> tableItems;
+    private Helpers helpers;
 
 
     public RunSimulationTask(Simulation s, Consumer<Long> runtimeConsumer, Consumer<Integer> ticksConsumer, Consumer<Double> progressConsumer, List<SimpleItem> tableItems) {
@@ -28,6 +30,7 @@ public class RunSimulationTask extends Task<Boolean> {
         this.ticksConsumer = ticksConsumer;
         this.progressConsumer = progressConsumer;
         this.tableItems = tableItems;
+        this.helpers = new Helpers();
     }
 
     public void updateConsumers(Consumer<Long> runtimeConsumer, Consumer<Integer> ticksConsumer, Consumer<Double> progressConsumer, List<SimpleItem> tableItems) {
@@ -103,7 +106,7 @@ public class RunSimulationTask extends Task<Boolean> {
 
             updateMessage("End simulation");
         } catch (Exception e) {
-            e.printStackTrace();
+            helpers.openErrorDialog("Runtime error occurred when running the simulation");
         }
 
         return true;

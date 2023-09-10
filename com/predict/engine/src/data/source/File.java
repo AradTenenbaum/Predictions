@@ -126,7 +126,6 @@ public class File {
 
         List<Action> actions;
         try {
-//            Validation.stringNoSpaceValidation(trimmedName);
             actions = buildActions(fileRule.getPRDActions());
         } catch (ValidationException e) {
             throw new ValidationException("Rule: " + trimmedName + " -> " + e.getMessage());
@@ -230,11 +229,13 @@ public class File {
             Validation.isEntityExists(entities, fileAction.getPRDBetween().getSourceEntity());
             Validation.isEntityExists(entities, fileAction.getPRDBetween().getTargetEntity());
             Validation.ifEnvIsValid(environment, fileAction.getPRDEnvDepth().getOf());
+            if(Function.whichFunction(fileAction.getPRDEnvDepth().getOf()) == null) Validation.isValueFromType(PropertyType.DECIMAL, fileAction.getPRDEnvDepth().getOf());
             List<Action> actions = buildActions(fileAction.getPRDActions());
             return new Proximity(fileAction.getPRDBetween().getSourceEntity(), fileAction.getPRDBetween().getTargetEntity(),fileAction.getPRDEnvDepth().getOf(), actions);
         } else if (fileAction.getType().equals(ActionType.REPLACE)) {
             Validation.isEntityExists(entities, fileAction.getKill());
             Validation.isEntityExists(entities, fileAction.getCreate());
+            Validation.isValidReplaceMode(fileAction.getMode());
             return new Replace(fileAction.getKill(), fileAction.getCreate(), fileAction.getMode());
         } else {
             throw new ValidationException("'" + fileAction.getType() +"' is not a valid action type");

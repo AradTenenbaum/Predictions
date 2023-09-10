@@ -18,6 +18,7 @@ import logic.tasks.RunSimulationTask;
 import simulation.Manager;
 import utils.Helpers;
 import utils.exception.SimulationException;
+import utils.exception.ValidationException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -90,8 +91,12 @@ public class ExecutionController implements Initializable {
         Platform.runLater(textField::requestFocus);
         dialog.setResultConverter(buttonType -> {
             if (buttonType == ButtonType.OK) {
-                manager.setEnvVar(metadata[0], textField.getText());
-                setDisplay();
+                try {
+                    manager.setEnvVar(metadata[0], textField.getText());
+                    setDisplay();
+                } catch (ValidationException e) {
+                    helpers.openErrorDialog(e.getMessage());
+                }
                 return textField.getText();
             }
             return null;
@@ -114,8 +119,14 @@ public class ExecutionController implements Initializable {
         Platform.runLater(textField::requestFocus);
         dialog.setResultConverter(buttonType -> {
             if (buttonType == ButtonType.OK) {
-                manager.setPopulation(metadata[0], Integer.parseInt(textField.getText()));
-                setDisplay();
+                try {
+                    manager.setPopulation(metadata[0], Integer.parseInt(textField.getText()));
+                    setDisplay();
+                } catch (ValidationException e) {
+                    helpers.openErrorDialog(e.getMessage());
+                } catch (NumberFormatException e) {
+                    helpers.openErrorDialog("Population must be a number");
+                }
                 return textField.getText();
             }
             return null;

@@ -54,15 +54,11 @@ public class Manager implements Serializable {
         return simulations;
     }
 
-    public void setEnvVar(String property, String value) {
+    public void setEnvVar(String property, String value) throws ValidationException {
         Object fixedValue = value;
-        try {
-            Validation.checkPropValid(currentWorld.getEnvironment().getProperties().get(property), value);
-            fixedValue = Convert.stringToType(value, currentWorld.getEnvironment().getProperties().get(property).getType());
-            environmentInstance.setProperty(property, fixedValue);
-        } catch (ValidationException e) {
-            System.out.println("Not valid");
-        }
+        Validation.checkPropValid(currentWorld.getEnvironment().getProperties().get(property), value);
+        fixedValue = Convert.stringToType(value, currentWorld.getEnvironment().getProperties().get(property).getType());
+        environmentInstance.setProperty(property, fixedValue);
     }
 
     public boolean isRandomEnvVar(String name) {
@@ -121,7 +117,7 @@ public class Manager implements Serializable {
         return s;
     }
 
-    public void setPopulation(String entity, int number) {
+    public void setPopulation(String entity, int number) throws ValidationException {
         AtomicInteger populationSum = new AtomicInteger(number);
         currentWorld.getEntities().forEach((s, entity1) -> {
             if(!s.equals(entity)) {
@@ -131,6 +127,8 @@ public class Manager implements Serializable {
         if(!(populationSum.get() > currentWorld.getGrid().getColumns()*currentWorld.getGrid().getRows())) {
             currentWorld.getEntities().get(entity).setPopulation(number);
             updateWorldDto();
+        } else {
+            throw new ValidationException("Amount of entity instances cannot be greater than the grid size: " + currentWorld.getGrid().getRows() + "x" + currentWorld.getGrid().getColumns() + " = "  + currentWorld.getGrid().getColumns()*currentWorld.getGrid().getRows());
         }
     }
 

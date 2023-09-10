@@ -80,6 +80,8 @@ public class DetailsController {
         }
         treeView.setRoot(rootItem);
 
+        rootItem.setExpanded(true);
+
     }
 
     public void loadEntity(String fxmlFile, Pane placeholder, EntityDto entityDto) {
