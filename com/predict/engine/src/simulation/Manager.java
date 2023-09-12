@@ -27,15 +27,18 @@ public class Manager implements Serializable {
     private History history;
     private EnvironmentInstance environmentInstance;
     private List<Simulation> simulations;
+    private int worldVersion = 0;
 
     public Manager() {
         this.isValidWorld = false;
         this.history = new History();
         this.environmentInstance = new EnvironmentInstanceImpl();
         this.simulations = new ArrayList<>();
+        this.worldVersion = 0;
     }
 
-    public void setEnvironmentInstance(EnvironmentInstance environmentInstance, Map<String, Integer> populations) {
+    public void setEnvironmentInstance(EnvironmentInstance environmentInstance, Map<String, Integer> populations, int worldVersion) throws SimulationException {
+        if(worldVersion != this.worldVersion) throw new SimulationException("New world was loaded, cannot rerun old simulations");
         this.environmentInstance = new EnvironmentInstanceImpl(environmentInstance, populations);
     }
 
@@ -102,7 +105,7 @@ public class Manager implements Serializable {
         // Create the grid
         Grid grid = currentWorld.getGrid().generateGrid(entities);
 
-        Simulation s = new Simulation(entities, sharedWorld, currentWorld, env, grid);
+        Simulation s = new Simulation(entities, sharedWorld, currentWorld, env, grid, worldVersion);
         entities.forEach((s1, entityInstances) -> {
             entityInstances.forEach(entityInstance -> {
                 entityInstance.getProperties().forEach((s2, propertyInstance) -> {
@@ -134,6 +137,7 @@ public class Manager implements Serializable {
 
     public void setCurrentWorld(World currentWorld) {
         this.currentWorld = currentWorld;
+        worldVersion++;
         clearEnv();
     }
 
@@ -183,6 +187,10 @@ public class Manager implements Serializable {
         }
     }
 
+    public int getWorldVersion() {
+        return worldVersion;
+    }
+
     public int getThreadsNumber() {
         return currentWorld.getThreadPoolCount();
     }
@@ -222,7 +230,7 @@ public class Manager implements Serializable {
 
         List<EntityInstance> toCreate = new ArrayList<>();
 
-        Simulation s = new Simulation(entities, sharedWorld, currentWorld, env, grid);
+        Simulation s = new Simulation(entities, sharedWorld, currentWorld, env, grid, worldVersion);
 
         int ticks = 0;
         long startTime = System.currentTimeMillis();

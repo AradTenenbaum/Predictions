@@ -33,7 +33,6 @@ public class MultipleCondition extends Condition {
         else if(logical.equals(OR)) {
             for(Condition c : conditions) {
                 if(c.isTrue(entityInstance, env, context)) {
-                    System.out.println("True");
                     return true;
                 }
             }

@@ -99,6 +99,9 @@ public class ResultController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(Helpers.STATISTICS_PATH));
             BorderPane component = loader.load();
             StatisticsController statisticsController = loader.getController();
+            statisticsController.setManager(manager);
+            statisticsController.setTasksManager(tasksManager);
+            statisticsController.setPlaceholder(placeholder);
             statisticsController.setCurrentSimulation(simulation);
             helpers.fitParent(simulationPlaceholder, component);
 
@@ -116,6 +119,7 @@ public class ResultController implements Initializable {
             runtimeController.setManager(manager);
             runtimeController.setTasksManager(tasksManager);
             runtimeController.setPlaceholder(placeholder);
+            runtimeController.setSimulationPlaceholder(simulationPlaceholder);
             runtimeController.setCurrentSimulation(simulation);
             Optional<RunSimulationTask> task = tasksManager.getTaskBySimulationId(simulation.getId().toString());
             task.ifPresent(runtimeController::setTask);

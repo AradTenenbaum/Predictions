@@ -1,20 +1,30 @@
 package components.statistics;
 
+import components.execution.ExecutionController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import logic.TasksManager;
+import simulation.Manager;
 import simulation.Simulation;
 import simulation.statistics.EntityStatistics;
 import simulation.statistics.PropertyStatistics;
+import utils.Helpers;
 import utils.SimpleItem;
+import utils.exception.SimulationException;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +51,17 @@ public class StatisticsController implements Initializable {
     private Simulation currentSimulation;
     @FXML
     private StackPane graphPlaceholder;
+    private Helpers helpers;
+    private Pane placeholder;
+    private Manager manager;
+    private TasksManager tasksManager;
+    @FXML
+    private Button rerunBtn;
+
 
     public StatisticsController() {
         tableStatisticsItems = new ArrayList<>();
+        helpers = new Helpers();
     }
 
     public void setCurrentSimulation(Simulation currentSimulation) {
@@ -55,8 +73,21 @@ public class StatisticsController implements Initializable {
         title.setText("Simulation: " + currentSimulation.getId());
         ticksLabel.setText("Ticks: " + currentSimulation.getTicks());
         runtimeLabel.setText("Runtime: " + currentSimulation.getRunTime() + " sec");
+        rerunBtn.setDisable((currentSimulation.getWorldVersion() != manager.getWorldVersion()));
         setGraph();
         setTree();
+    }
+
+    public void setPlaceholder(Pane placeholder) {
+        this.placeholder = placeholder;
+    }
+
+    public void setManager(Manager manager) {
+        this.manager = manager;
+    }
+
+    public void setTasksManager(TasksManager tasksManager) {
+        this.tasksManager = tasksManager;
     }
 
     private void setGraph() {
@@ -145,6 +176,37 @@ public class StatisticsController implements Initializable {
                     displayPropertyData(item.getParent().getValue(), item.getValue());
                 }
             }
+        }
+    }
+
+    public void loadExecution() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(Helpers.EXECUTION_PATH));
+            Pane component = loader.load();
+            ExecutionController executionController = loader.getController();
+            executionController.setManager(manager);
+            executionController.setTasksManager(tasksManager);
+            executionController.setPlaceholder(placeholder);
+            helpers.fitParent(placeholder, component);
+
+            VBox p = (VBox) component.getChildren().get(0);
+            p.prefWidthProperty().bind(component.widthProperty());
+            p.prefHeightProperty().bind(component.heightProperty());
+
+            placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void rerunSimulation(ActionEvent event) {
+        try {
+            manager.setEnvironmentInstance(currentSimulation.getEnvironmentInstance(), currentSimulation.getPopulations(), currentSimulation.getWorldVersion());
+            manager.setPopulations(currentSimulation.getPopulations());
+            loadExecution();
+        } catch (SimulationException e) {
+            helpers.openErrorDialog(e.getMessage());
         }
     }
 

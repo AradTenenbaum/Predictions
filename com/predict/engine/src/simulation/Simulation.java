@@ -34,11 +34,12 @@ public class Simulation implements Serializable {
     private long runTime;
     private int ticks;
     private Statistics statistics;
+    private int worldVersion;
     public enum STATUS {
         RUN, PAUSED, STOPPED
     }
 
-    public Simulation(Map<String, List<EntityInstance>> entities, WorldDto worldDto, World world, EnvironmentInstance environmentInstance, Grid grid) {
+    public Simulation(Map<String, List<EntityInstance>> entities, WorldDto worldDto, World world, EnvironmentInstance environmentInstance, Grid grid, int worldVersion) {
         this.id = UUID.randomUUID();
         this.entities = entities;
         this.runDate = new Date();
@@ -59,7 +60,7 @@ public class Simulation implements Serializable {
         this.grid = grid;
         this.runTime = 0;
         this.ticks = 0;
-
+        this.worldVersion = worldVersion;
     }
 
     public void pause() {
@@ -74,12 +75,20 @@ public class Simulation implements Serializable {
         }
     }
 
+    public int getWorldVersion() {
+        return worldVersion;
+    }
+
     public Map<String, Integer> getPopulations() {
         return environmentInstance.getPopulations();
     }
 
     public Statistics getStatistics() {
         return statistics;
+    }
+
+    public boolean isUserStop() {
+        return world.getTermination().isByUser();
     }
 
     public void stop() {

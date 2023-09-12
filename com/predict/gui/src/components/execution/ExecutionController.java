@@ -81,7 +81,6 @@ public class ExecutionController implements Initializable {
         Dialog<String> dialog = new Dialog<>();
 
         String metadata[] = selectedItem.split(":");
-        System.out.println(metadata[0] + " " + metadata[1]);
 
         dialog.setTitle("Edit " + metadata[0]);
         dialog.setHeaderText("Edit environment variable "+ metadata[0] +":");
@@ -109,7 +108,6 @@ public class ExecutionController implements Initializable {
         Dialog<String> dialog = new Dialog<>();
 
         String metadata[] = selectedItem.split(":");
-        System.out.println(metadata[0] + " " + metadata[1]);
 
         dialog.setTitle("Edit population of " + metadata[0]);
         dialog.setHeaderText("Edit population of "+ metadata[0] +":");
@@ -173,8 +171,10 @@ public class ExecutionController implements Initializable {
             placeholder.getChildren().setAll(component);
         } catch (IOException e) {
             e.printStackTrace();
+            helpers.openErrorDialog("An error occurred");
         } catch (Exception e) {
             e.printStackTrace();
+            helpers.openErrorDialog("An error occurred");
         }
     }
 
@@ -183,7 +183,8 @@ public class ExecutionController implements Initializable {
         try {
             loadResults();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            helpers.openErrorDialog("An error occurred");
         }
     }
 

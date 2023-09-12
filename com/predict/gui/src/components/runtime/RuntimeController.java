@@ -1,11 +1,15 @@
 package components.runtime;
 
 import components.execution.ExecutionController;
+import components.statistics.StatisticsController;
 import ins.EntityInstance;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -14,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import logic.TasksManager;
@@ -22,6 +27,7 @@ import simulation.Manager;
 import simulation.Simulation;
 import utils.Helpers;
 import utils.SimpleItem;
+import utils.exception.SimulationException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,6 +41,7 @@ public class RuntimeController implements Initializable {
     @FXML
     private ProgressBar progressBar;
     private Pane placeholder;
+    private VBox simulationPlaceholder;
     private Manager manager;
 
     private TasksManager tasksManager;
@@ -46,6 +53,8 @@ public class RuntimeController implements Initializable {
 
     @FXML
     private Label ticksVal;
+    @FXML
+    private Button stopBtn;
 
     @FXML
     private TableView<SimpleItem> entitiesAmountsTable;
@@ -90,6 +99,10 @@ public class RuntimeController implements Initializable {
         task.display();
     }
 
+    public void setSimulationPlaceholder(VBox simulationPlaceholder) {
+        this.simulationPlaceholder = simulationPlaceholder;
+    }
+
     public void setPlaceholder(Pane placeholder) {
         this.placeholder = placeholder;
     }
@@ -120,6 +133,7 @@ public class RuntimeController implements Initializable {
         runTimeProp.set(s.getRunTime());
         ticksProp.set(s.getTicks());
         progressProp.set(s.getProgress());
+        stopBtn.setDisable(!s.isUserStop());
         tableItems.clear();
         s.getEntities().forEach((s1, entityInstances) -> {
             tableItems.add(new SimpleItem(s1, String.valueOf(entityInstances.stream().filter(EntityInstance::getAlive).count())));
@@ -137,6 +151,28 @@ public class RuntimeController implements Initializable {
         runtimeVal.textProperty().bind(Bindings.format("%d sec", runTimeProp));
         ticksVal.textProperty().bind(Bindings.format("%d", ticksProp));
         progressBar.progressProperty().bind(progressProp);
+        progressProp.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {
+            if(newValue.equals(1.0)) {
+                loadStatistics(currentSimulation);
+            }
+        }));
+    }
+
+    public void loadStatistics(Simulation simulation) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(Helpers.STATISTICS_PATH));
+            BorderPane component = loader.load();
+            StatisticsController statisticsController = loader.getController();
+            statisticsController.setManager(manager);
+            statisticsController.setTasksManager(tasksManager);
+            statisticsController.setPlaceholder(placeholder);
+            statisticsController.setCurrentSimulation(simulation);
+            helpers.fitParent(simulationPlaceholder, component);
+
+            simulationPlaceholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void loadExecution() {
@@ -161,9 +197,13 @@ public class RuntimeController implements Initializable {
 
     @FXML
     void rerunSimulation(ActionEvent event) {
-        manager.setEnvironmentInstance(currentSimulation.getEnvironmentInstance(), currentSimulation.getPopulations());
-        manager.setPopulations(currentSimulation.getPopulations());
-        loadExecution();
+        try {
+            manager.setEnvironmentInstance(currentSimulation.getEnvironmentInstance(), currentSimulation.getPopulations(), currentSimulation.getWorldVersion());
+            manager.setPopulations(currentSimulation.getPopulations());
+            loadExecution();
+        } catch (SimulationException e) {
+            helpers.openErrorDialog(e.getMessage());
+        }
     }
 
     @FXML
