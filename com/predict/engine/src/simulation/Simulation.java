@@ -164,8 +164,8 @@ public class Simulation implements Serializable {
         this.grid = grid;
     }
 
-    public void runTick() {
-        if(isRun()) {
+    public void runOneTick() {
+        if(!isStopped()) {
             long startTime = System.currentTimeMillis();
             List<EntityInstance> toCreate = new ArrayList<>();
 
@@ -245,6 +245,12 @@ public class Simulation implements Serializable {
             });
 
             checkStop();
+        }
+    }
+
+    public void runTick() {
+        if(isRun()) {
+            runOneTick();
         }
     }
 

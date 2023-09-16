@@ -9,7 +9,7 @@
    <children>
       <HBox prefHeight="400.0" prefWidth="600.0">
          <children>
-            <ListView fx:id="execList" HBox.hgrow="ALWAYS" />
+            <ListView fx:id="execList" minWidth="200.0" HBox.hgrow="ALWAYS" />
             <VBox fx:id="simulationPlaceholder" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>

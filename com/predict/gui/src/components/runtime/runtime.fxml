@@ -84,6 +84,19 @@
       </VBox>
    </center>
    <right>
-      <Button fx:id="rerunBtn" mnemonicParsing="false" onAction="#rerunSimulation" text="Rerun" BorderPane.alignment="CENTER" />
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <StackPane VBox.vgrow="ALWAYS">
+               <children>
+                  <Button fx:id="rerunBtn" mnemonicParsing="false" onAction="#rerunSimulation" text="Rerun" />
+               </children>
+            </StackPane>
+            <StackPane VBox.vgrow="ALWAYS">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#onRunTick" text="Run tick" />
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
    </right>
 </BorderPane>

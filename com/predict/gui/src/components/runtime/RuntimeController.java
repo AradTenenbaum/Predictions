@@ -209,6 +209,7 @@ public class RuntimeController implements Initializable {
     @FXML
     void pauseCurrentTask(ActionEvent event) {
         currentSimulation.pause();
+        displayOnConsumers();
     }
 
     @FXML
@@ -219,6 +220,15 @@ public class RuntimeController implements Initializable {
     @FXML
     void stopCurrentTask(ActionEvent event) {
         task.cancel();
+    }
+
+
+    @FXML
+    void onRunTick(ActionEvent event) {
+        if(currentSimulation.isPaused()) {
+            currentSimulation.runOneTick();
+            displayOnConsumers();
+        }
     }
 
 }
