@@ -1,1 +1,1 @@
-xjc -p data.jaxb ../../resources/ex2/predictions-v2.xsd
+xjc -p data.jaxb ../../resources/ex3/predictions-v3.xsd

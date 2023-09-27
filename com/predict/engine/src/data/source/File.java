@@ -47,9 +47,9 @@ public class File {
 
             rules = buildRules(fileWorld.getPRDRules());
 
-            termination = buildTermination(fileWorld.getPRDTermination());
+            termination = new Termination(true);
 
-            World world = new World(environment, entities, rules, termination, fileWorld.getPRDThreadCount(), new Grid(fileWorld.getPRDGrid().getRows(), fileWorld.getPRDGrid().getColumns()));
+            World world = new World(environment, entities, rules, termination, 1, new Grid(fileWorld.getPRDGrid().getRows(), fileWorld.getPRDGrid().getColumns()), fileWorld.getName(), fileWorld.getSleep());
             WorldDto sharedWorld = new WorldDto(world);
             manager.setCurrentWorld(world);
             manager.setSharedWorld(sharedWorld);

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+
+<TableView maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="components.pages.allocations.AllocationsController">
+  <columns>
+    <TableColumn fx:id="reqCol" prefWidth="46.0" text="Req" />
+    <TableColumn fx:id="simCol" prefWidth="97.0" text="Simulation" />
+      <TableColumn fx:id="userCol" prefWidth="57.0" text="User" />
+      <TableColumn fx:id="runsCol" minWidth="0.0" prefWidth="58.0" text="Runs" />
+      <TableColumn fx:id="terCol" prefWidth="145.0" text="Termination rules" />
+      <TableColumn fx:id="statusCol" prefWidth="58.0" text="Status" />
+      <TableColumn fx:id="approveCol" prefWidth="68.0" text="Approve" />
+      <TableColumn fx:id="declineCol" prefWidth="69.0" text="Decline" />
+  </columns>
+</TableView>
