@@ -1,8 +1,8 @@
 import components.login.LoginController;
+import http.HttpClientUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -29,5 +29,10 @@ public class Main extends Application {
         Scene scene = new Scene(root, 1050, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        HttpClientUtil.shutdown();
     }
 }

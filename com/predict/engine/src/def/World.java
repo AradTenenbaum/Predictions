@@ -26,6 +26,10 @@ public class World implements Serializable {
         this.sleep = Optional.ofNullable(sleep);
     }
 
+    public String getName() {
+        return name;
+    }
+
     public int getThreadPoolCount() {
         return threadPoolCount;
     }

@@ -1,12 +1,19 @@
 package components.main;
 
 import components.pages.management.ManagementDependencies;
+import errors.ErrorDialog;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import utils.Navigate;
+
+import javax.xml.bind.ValidationException;
 
 public class MainController {
 

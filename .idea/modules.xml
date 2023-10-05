@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Predictions.iml" filepath="$PROJECT_DIR$/Predictions.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/admin/admin.iml" filepath="$PROJECT_DIR$/com/predict/admin/admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/com/predict/client-shared/client-shared.iml" filepath="$PROJECT_DIR$/com/predict/client-shared/client-shared.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/console/console.iml" filepath="$PROJECT_DIR$/com/predict/console/console.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/dtos/dtos.iml" filepath="$PROJECT_DIR$/com/predict/dtos/dtos.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/engine/engine.iml" filepath="$PROJECT_DIR$/com/predict/engine/engine.iml" />

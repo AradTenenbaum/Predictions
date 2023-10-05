@@ -1,12 +1,12 @@
 package servlets;
 
 import com.google.gson.Gson;
-import generic.SimpleRequestObject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import services.UserService;
 import utils.Constants;
 import utils.Servlet;
 import utils.Session;
@@ -17,26 +17,32 @@ import java.io.PrintWriter;
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         String usernameFromSession = Session.getUsername(req);
-        resp.setContentType("application/json");
-        Gson gson = new Gson();
+        UserService userService = Servlet.getUserService(getServletContext());
 
         if(usernameFromSession == null) {
             String usernameFromParameter = req.getParameter(Constants.USERNAME);
             if(usernameFromParameter != null) {
-                req.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);
-                System.out.println("User login new session: " + usernameFromParameter);
-                try (PrintWriter out = resp.getWriter()) {
-                    SimpleRequestObject obj = new SimpleRequestObject("Success");
-                    String jsonResponse = gson.toJson(obj);
-                    out.print(jsonResponse);
-                    out.flush();
+
+                if(userService.isUserExists(usernameFromParameter)) {
+                    req.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);
+                    System.out.println("User login new session: " + usernameFromParameter);
+                    Servlet.success(resp);
+                } else {
+                    Servlet.errorMessage(resp, "No such user");
                 }
+
+            } else {
+                Servlet.errorMessage(resp, "Username can't be empty");
             }
         } else {
-            System.out.println("User login: " + usernameFromSession);
-            Servlet.success(resp);
+            if(userService.isUserExists(usernameFromSession)) {
+                System.out.println("User login: " + usernameFromSession);
+                Servlet.success(resp);
+            } else {
+                Servlet.errorMessage(resp, "No such user");
+            }
         }
 
     }

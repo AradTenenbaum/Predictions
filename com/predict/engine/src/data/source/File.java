@@ -32,6 +32,29 @@ public class File {
     private static Map<String, Entity> entities;
     private static List<Rule> rules;
     private static Termination termination;
+
+    public static World createWorldFromInputStream(InputStream inputStream) throws Exception {
+        try {
+            PRDWorld fileWorld = deserializeFrom(inputStream);
+
+            environment = buildEnvironment(fileWorld.getPRDEnvironment());
+            entities = buildEntities(fileWorld.getPRDEntities());
+
+            rules = buildRules(fileWorld.getPRDRules());
+
+            termination = new Termination(true);
+
+            World world = new World(environment, entities, rules, termination, 1, new Grid(fileWorld.getPRDGrid().getRows(), fileWorld.getPRDGrid().getColumns()), fileWorld.getName(), fileWorld.getSleep());
+            return world;
+        } catch (JAXBException e) {
+            throw new ValidationException("File might not match scheme");
+        } catch (ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        } catch (Exception e) {
+            throw new Exception("There is an error. please try again");
+        }
+    }
+
     public static void fetchDataFromFile(String path, Manager manager) throws ValidationException, FileException, Exception {
         try {
 

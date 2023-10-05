@@ -4,8 +4,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 
@@ -16,8 +19,8 @@
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="256.0" minWidth="10.0" prefWidth="151.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="256.0" minWidth="10.0" prefWidth="109.0" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="256.0" minWidth="10.0" prefWidth="109.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="15.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="124.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="82.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="26.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="194.0" minWidth="10.0" prefWidth="158.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="147.0" minWidth="0.0" prefWidth="36.0" />
   </columnConstraints>
@@ -50,8 +53,7 @@
             <Button mnemonicParsing="false" onAction="#loadFileClick" text="Load file" />
          </children>
       </StackPane>
-      <ListView fx:id="simulationsList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="2" />
-      <ListView fx:id="threadPoolList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.rowSpan="2" />
+      <ListView fx:id="threadPoolList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="7" GridPane.rowIndex="3" GridPane.rowSpan="2" />
       <StackPane prefHeight="150.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2">
          <children>
             <Label text="Simulations" />
@@ -63,5 +65,11 @@
          </children>
       </StackPane>
       <Separator prefWidth="200.0" style="-fx-background-color: grey;" GridPane.columnIndex="1" GridPane.columnSpan="7" GridPane.rowIndex="1" />
+      <SplitPane dividerPositions="0.2507163323782235" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="3" GridPane.rowSpan="2">
+         <items>
+            <TreeView fx:id="treeView" />
+            <Pane fx:id="detailsDisplay" />
+         </items>
+      </SplitPane>
    </children>
 </GridPane>

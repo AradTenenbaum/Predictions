@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="okhttp">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/com/predict/resources/libraries/okhttp/annotations-13.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/com/predict/resources/libraries/okhttp/kotlin-stdlib-1.4.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/com/predict/resources/libraries/okhttp/okhttp-4.9.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/com/predict/resources/libraries/okhttp/okio-2.8.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/com/predict/resources/libraries/okhttp/kotlin-stdlib-common-1.4.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
