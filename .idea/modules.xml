@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/com/predict/console/console.iml" filepath="$PROJECT_DIR$/com/predict/console/console.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/dtos/dtos.iml" filepath="$PROJECT_DIR$/com/predict/dtos/dtos.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/engine/engine.iml" filepath="$PROJECT_DIR$/com/predict/engine/engine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/com/predict/globals/globals.iml" filepath="$PROJECT_DIR$/com/predict/globals/globals.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/gui/gui.iml" filepath="$PROJECT_DIR$/com/predict/gui/gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/server/server.iml" filepath="$PROJECT_DIR$/com/predict/server/server.iml" />
       <module fileurl="file://$PROJECT_DIR$/com/predict/user/user.iml" filepath="$PROJECT_DIR$/com/predict/user/user.iml" />

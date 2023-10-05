@@ -11,6 +11,7 @@
           <element id="file-copy" path="$PROJECT_DIR$/com/predict/resources/libraries/gson-2.8.8.jar" />
           <element id="artifact" artifact-name="dtos:jar" />
           <element id="artifact" artifact-name="engine" />
+          <element id="artifact" artifact-name="globals:jar" />
         </element>
       </element>
     </root>

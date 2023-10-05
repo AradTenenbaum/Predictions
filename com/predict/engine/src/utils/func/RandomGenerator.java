@@ -1,8 +1,7 @@
 package utils.func;
 
 import def.PropertyType;
-import utils.object.Position;
-import utils.object.Range;
+import generic.objects.Range;
 
 import java.util.Random;
 

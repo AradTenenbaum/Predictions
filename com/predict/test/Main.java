@@ -1,15 +1,6 @@
 package com.predict.test;
 
-import data.source.File;
-import def.PropertyType;
-import ins.environment.EnvironmentInstance;
-import ins.environment.EnvironmentInstanceImpl;
 import simulation.Manager;
-import utils.func.RandomGenerator;
-import utils.object.Range;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {

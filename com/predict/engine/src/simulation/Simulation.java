@@ -7,17 +7,16 @@ import def.World;
 import ins.EntityInstance;
 import ins.environment.EnvironmentInstance;
 import ins.environment.EnvironmentInstanceImpl;
+import generic.objects.Range;
 import simulation.statistics.Statistics;
 import utils.exception.SimulationException;
 import utils.func.RandomGenerator;
 import utils.object.Grid;
 import utils.object.Point;
-import utils.object.Range;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 

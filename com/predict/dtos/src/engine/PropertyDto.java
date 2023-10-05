@@ -1,8 +1,8 @@
-package data.dto;
+package engine;
 
-import generic.objects.Range;
 
 import java.io.Serializable;
+import generic.objects.Range;
 
 public class PropertyDto implements Serializable {
     private String name;

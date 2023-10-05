@@ -1,8 +1,8 @@
 package def;
 
+import generic.objects.Range;
 import utils.func.Convert;
 import utils.func.RandomGenerator;
-import utils.object.Range;
 
 import java.io.Serializable;
 

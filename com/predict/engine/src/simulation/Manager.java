@@ -8,12 +8,12 @@ import ins.EntityInstance;
 import ins.PropertyInstance;
 import ins.environment.EnvironmentInstance;
 import ins.environment.EnvironmentInstanceImpl;
+import generic.objects.Range;
 import utils.exception.SimulationException;
 import utils.exception.ValidationException;
 import utils.func.Convert;
 import utils.func.RandomGenerator;
 import utils.object.Grid;
-import utils.object.Range;
 
 import java.io.Serializable;
 import java.util.*;

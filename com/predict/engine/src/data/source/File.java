@@ -8,12 +8,11 @@ import def.action.*;
 import def.action.condition.Condition;
 import def.action.condition.MultipleCondition;
 import def.action.condition.SingleCondition;
+import generic.objects.Range;
 import simulation.Manager;
 import utils.exception.FileException;
 import utils.exception.ValidationException;
-import utils.func.Convert;
 import utils.object.Grid;
-import utils.object.Range;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

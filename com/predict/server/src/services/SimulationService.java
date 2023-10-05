@@ -1,6 +1,7 @@
 package services;
 
 import def.World;
+import engine.WorldDto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +29,14 @@ public class SimulationService {
 
     public boolean hasWorld(String worldName) {
         return worlds.containsKey(worldName);
+    }
+
+    public List<WorldDto> getWorldDtos() {
+        List<WorldDto> worldDtos = new ArrayList<>();
+        worlds.forEach((s, world) -> {
+            worldDtos.add(new WorldDto(world));
+        });
+        return  worldDtos;
     }
 
     public List<String> getWorlds() {

@@ -1,4 +1,4 @@
-package utils.object;
+package generic.objects;
 
 import java.io.Serializable;
 import java.util.Random;

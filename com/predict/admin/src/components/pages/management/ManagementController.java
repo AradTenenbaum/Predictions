@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.FileChooser;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ public class ManagementController {
     private Label filePathLabel;
 
     @FXML
-    private ListView<?> simulationsList;
+    private TreeView<?> treeView;
 
     @FXML
     private ListView<?> threadPoolList;
@@ -136,5 +137,10 @@ public class ManagementController {
         });
 
         dialog.show();
+    }
+
+    @FXML
+    void selectItemInTree(ContextMenuEvent event) {
+
     }
 }

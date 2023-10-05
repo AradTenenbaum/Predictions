@@ -2,6 +2,7 @@ package servlets.simulation;
 
 import data.source.File;
 import def.World;
+import engine.WorldDto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -56,8 +57,8 @@ public class SimulationServlet extends HttpServlet {
         Auth.admin(req, resp);
         SimulationService simulationService = Servlet.getSimulationService(getServletContext());
 
-        List<String> simNames = simulationService.getWorlds();
-        Servlet.successWithObject(resp, simNames);
+        List<WorldDto> worldDtos = simulationService.getWorldDtos();
+        Servlet.successWithObject(resp, worldDtos);
 
     }
 }

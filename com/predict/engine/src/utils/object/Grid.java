@@ -1,7 +1,7 @@
 package utils.object;
 
 import ins.EntityInstance;
-import javafx.geometry.Pos;
+import generic.objects.Range;
 import utils.func.RandomGenerator;
 
 import java.util.ArrayList;

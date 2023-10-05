@@ -1,19 +1,16 @@
 package def;
 
 import ins.EntityInstance;
-import ins.PropertyInstance;
 import ins.environment.EnvironmentInstance;
+import generic.objects.Range;
 import simulation.Context;
 import utils.exception.SimulationException;
 import utils.func.Convert;
 import utils.func.RandomGenerator;
-import utils.object.Range;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Function {
     public final static String ENVIRONMENT =  "environment";
