@@ -13,4 +13,14 @@ public class Auth {
             Servlet.forbidden(resp);
         }
     }
+
+    public static String user(HttpServletRequest req, HttpServletResponse resp) {
+        String usernameFromSession = Session.getUsername(req);
+        if(usernameFromSession == null) {
+            Servlet.unauthorized(resp);
+            return null;
+        } else {
+            return usernameFromSession;
+        }
+    }
 }

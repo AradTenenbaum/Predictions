@@ -25,4 +25,13 @@ public class ThreadServlet extends HttpServlet {
             Servlet.generalError(resp);
         }
     }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        Auth.admin(req, resp);
+        SimulationService simulationService = Servlet.getSimulationService(getServletContext());
+
+        simulationService.getThreads();
+        Servlet.success(resp);
+    }
 }

@@ -27,7 +27,7 @@
          </rowConstraints>
          <children>
             <Label id="mainLabel" alignment="CENTER" prefHeight="21.0" prefWidth="925.0" text="Predictions - Client" GridPane.columnIndex="1" GridPane.columnSpan="4" />
-            <StackPane prefHeight="150.0" prefWidth="200.0">
+            <StackPane prefHeight="150.0" prefWidth="200.0" GridPane.columnSpan="2">
                <children>
                   <Label fx:id="userLabel" text="Name:" />
                </children>

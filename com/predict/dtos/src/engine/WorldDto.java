@@ -21,13 +21,18 @@ import java.util.List;
 import java.util.Map;
 
 public class WorldDto implements Serializable {
+
+    private String name;
     private EnvironmentDto environment;
     private List<EntityDto> entities;
     private List<RuleDto> rules;
     private TerminationDto termination;
     private GridDto gridDto;
 
+    public WorldDto() {}
+
     public WorldDto(World world) {
+        this.name = world.getName();
         this.entities = new ArrayList<>();
         this.rules = new ArrayList<>();
         List<PropertyDto> envProperties = new ArrayList<>();
@@ -108,5 +113,9 @@ public class WorldDto implements Serializable {
 
     public GridDto getGridDto() {
         return gridDto;
+    }
+
+    public String getName() {
+        return name;
     }
 }

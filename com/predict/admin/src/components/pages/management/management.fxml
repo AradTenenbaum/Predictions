@@ -67,7 +67,7 @@
       <Separator prefWidth="200.0" style="-fx-background-color: grey;" GridPane.columnIndex="1" GridPane.columnSpan="7" GridPane.rowIndex="1" />
       <SplitPane dividerPositions="0.2507163323782235" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="3" GridPane.rowSpan="2">
          <items>
-            <TreeView fx:id="treeView" onContextMenuRequested="#selectItemInTree" onMouseClicked="#selectItemInTree" />
+            <TreeView fx:id="treeView" onMouseClicked="#selectItemInTree" />
             <Pane fx:id="detailsDisplay" />
          </items>
       </SplitPane>

@@ -42,12 +42,13 @@ public class LoginController {
                 } else {
                     Platform.runLater(() -> {
                         try {
-                            Navigate.mainInit(primaryStage);
+                            Navigate.mainInit(primaryStage, username);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     });
                 }
+                response.body().close();
             }
         });
     }

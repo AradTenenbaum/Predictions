@@ -2,16 +2,28 @@ package components.main;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import utils.Navigate;
 
-public class MainController {
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class MainController implements Initializable {
 
     @FXML
     private Pane placeholder;
 
     private Stage primaryStage;
+
+    private String username;
+
+    @FXML
+    private Label userLabel;
 
     @FXML
     void detailsClick(ActionEvent event) {
@@ -25,7 +37,7 @@ public class MainController {
 
     @FXML
     void requestClick(ActionEvent event) {
-
+        Navigate.requests(placeholder);
     }
 
     @FXML
@@ -33,7 +45,17 @@ public class MainController {
 
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+        userLabel.setText("Name: " + username);
+    }
+
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
     }
 }

@@ -1,8 +1,11 @@
 package servlets.simulation;
 
 import data.source.File;
+import data.validation.Validation;
 import def.World;
+import engine.RuleDto;
 import engine.WorldDto;
+import engine.actions.ActionDto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,6 +16,7 @@ import jakarta.servlet.http.Part;
 import services.SimulationService;
 import utils.Auth;
 import utils.Servlet;
+import utils.func.Convert;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "SimulationServlet", urlPatterns = {"/simulation"})
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
@@ -54,11 +59,51 @@ public class SimulationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Auth.admin(req, resp);
+        Auth.user(req, resp);
+
+        String world = req.getParameter("world");
+        String action = req.getParameter("action");
+        String actionIndex = req.getParameter("actionIndex");
+        String rule = req.getParameter("rule");
+
         SimulationService simulationService = Servlet.getSimulationService(getServletContext());
 
         List<WorldDto> worldDtos = simulationService.getWorldDtos();
-        Servlet.successWithObject(resp, worldDtos);
 
+        if(world != null) {
+            Optional<WorldDto> worldDto = worldDtos.stream().filter(wdto -> wdto.getName().equals(world)).findFirst();
+            if(worldDto.isPresent()) {
+                if(rule != null) {
+                    Optional<RuleDto> ruleDto = worldDto.get().getRules().stream().filter(rdto -> rdto.getName().equals(rule)).findFirst();
+                    if(ruleDto.isPresent()){
+                        if(action != null && actionIndex != null) {
+                            if(Validation.isInteger(actionIndex)) {
+                                int index = Convert.stringToInteger(actionIndex);
+                                List<ActionDto> actionDto = ruleDto.get().getActions().stream().filter(adto -> adto.getType().equals(action)).collect(Collectors.toList());
+                                if(actionDto.get(index) != null) {
+                                    Servlet.successWithObject(resp, actionDto.get(index));
+                                } else {
+                                    Servlet.notFound(resp);
+                                }
+                            } else {
+                                Servlet.notFound(resp);
+                            }
+
+                        } else {
+                            Servlet.successWithObject(resp, ruleDto.get());
+                        }
+                    } else {
+                        Servlet.notFound(resp);
+                    }
+                } else {
+                    Servlet.successWithObject(resp, worldDto.get());
+                }
+            } else {
+                Servlet.notFound(resp);
+            }
+        }
+        else {
+            Servlet.successWithObject(resp, worldDtos);
+        }
     }
 }

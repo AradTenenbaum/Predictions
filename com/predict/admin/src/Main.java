@@ -24,6 +24,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // TODO: remove when finished
+        HttpClientUtil.init();
         HttpClientUtil.runAsyncGet(Constants.ADMIN_URL, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -59,6 +61,7 @@ public class Main extends Application {
                     primaryStage.setScene(scene);
                     primaryStage.show();
                 });
+                response.body().close();
             }
         });
     }

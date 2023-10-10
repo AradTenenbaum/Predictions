@@ -11,6 +11,7 @@ import utils.SimpleItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ActionController {
 
@@ -26,20 +27,25 @@ public class ActionController {
     @FXML
     private TableView<SimpleItem> detailsTable;
 
-    private ActionDto currentAction;
+    private ActionDependencies actionDependencies;
     private List<SimpleItem> simpleItems;
 
-    public void setCurrentAction(ActionDto currentAction) {
-        this.currentAction = currentAction;
+    public ActionController() {
+    }
+
+    public void setActionDependencies(ActionDependencies actionDependencies) {
+        this.actionDependencies = actionDependencies;
         setDisplay();
     }
 
     private void setDisplay() {
+        Map<Object, Object> actionData = actionDependencies.getActionData();
         simpleItems = new ArrayList<>();
-        currentAction.getParams().forEach((s, s2) -> {
-            simpleItems.add(new SimpleItem(s, s2));
+        actionData.forEach((s, s2) -> {
+            System.out.println(s+ " " + s2);
+            simpleItems.add(new SimpleItem(String.valueOf(s), String.valueOf(s2)));
         });
-        actionLabel.setText(currentAction.getType());
+        actionLabel.setText(String.valueOf(actionData.get("type")));
         nameCol.setCellValueFactory(
                 param -> param.getValue().getFirst()
         );

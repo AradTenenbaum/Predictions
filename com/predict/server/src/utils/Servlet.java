@@ -2,6 +2,8 @@ package utils;
 
 import com.google.gson.Gson;
 //import generic.SimpleRequestObject;
+import com.google.gson.reflect.TypeToken;
+import engine.WorldDto;
 import generic.*;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.util.List;
 
 public class Servlet {
 
@@ -40,7 +43,7 @@ public class Servlet {
         try (PrintWriter out = resp.getWriter()) {
             Gson gson = new Gson();
             resp.setStatus(HttpURLConnection.HTTP_OK);
-            String json = gson.toJson(obj);
+            String json = gson.toJson(obj, obj.getClass());
             out.println(json);
             out.flush();
         } catch (IOException e) {
@@ -75,6 +78,21 @@ public class Servlet {
             Gson gson = new Gson();
             resp.setStatus(HttpURLConnection.HTTP_FORBIDDEN);
             MessageObject obj = new MessageObject("Resource is not available for this user");
+            String json = gson.toJson(obj);
+            out.println(json);
+            out.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void notFound(HttpServletResponse resp) {
+        resp.setContentType("application/json");
+
+        try (PrintWriter out = resp.getWriter()) {
+            Gson gson = new Gson();
+            resp.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
+            MessageObject obj = new MessageObject("Resource was not found");
             String json = gson.toJson(obj);
             out.println(json);
             out.flush();

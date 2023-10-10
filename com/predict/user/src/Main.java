@@ -15,6 +15,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // TODO: remove when finished
+        HttpClientUtil.init();
         FXMLLoader loader = new FXMLLoader();
 
         URL mainFXML = getClass().getResource("/components/login/login.fxml");
