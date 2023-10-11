@@ -10,6 +10,12 @@ public class Termination implements Serializable {
     private int seconds;
     private boolean isByUser;
 
+    public Termination(int ticks, int seconds, boolean isByUser) {
+        this.ticks = ticks;
+        this.seconds = seconds;
+        this.isByUser = isByUser;
+    }
+
     public Termination(int ticks, int seconds) {
         this.ticks = ticks;
         this.seconds = seconds;

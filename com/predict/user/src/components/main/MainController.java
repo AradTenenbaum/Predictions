@@ -27,7 +27,7 @@ public class MainController implements Initializable {
 
     @FXML
     void detailsClick(ActionEvent event) {
-
+        Navigate.details(placeholder);
     }
 
     @FXML
@@ -42,7 +42,7 @@ public class MainController implements Initializable {
 
     @FXML
     void resClick(ActionEvent event) {
-
+        Navigate.results(placeholder);
     }
 
     public void setUsername(String username) {
@@ -56,6 +56,6 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        Navigate.details(placeholder);
     }
 }

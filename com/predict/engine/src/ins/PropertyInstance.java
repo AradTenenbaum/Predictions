@@ -26,6 +26,13 @@ public class PropertyInstance implements Serializable {
         this.propertyStatistics = propertyStatistics;
     }
 
+    public PropertyInstance(String type, Object value) {
+        this.type = type;
+        this.value = value;
+        this.isRandom = false;
+        this.lastChangedTick = 0;
+    }
+
     public PropertyInstance(String type) {
         this.type = type;
         this.value = 0;

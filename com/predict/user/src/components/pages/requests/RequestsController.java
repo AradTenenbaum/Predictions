@@ -16,11 +16,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import services.RequestDto;
 import services.RequestFullDto;
 import utils.Constants;
+import utils.Navigate;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -71,6 +73,11 @@ public class RequestsController implements Initializable {
     private TableView<RequestFullDto> reqTable;
 
     private List<RequestFullDto> requestFullDtos;
+    private Pane placeholder;
+
+    public void setPlaceholder(Pane placeholder) {
+        this.placeholder = placeholder;
+    }
 
     @FXML
     void onSubmitRequest(MouseEvent event) {
@@ -168,7 +175,9 @@ public class RequestsController implements Initializable {
                     Platform.runLater(() -> ErrorDialog.send(messageObject.getMessage()));
                 } else {
                     requestFullDtos = HttpClientUtil.fromJsonToListOfRequestFullDto(response.body());
-                    setUpTableUI();
+                    Platform.runLater(() -> {
+                        setUpTableUI();
+                    });
                 }
                 response.body().close();
             }
@@ -206,7 +215,7 @@ public class RequestsController implements Initializable {
                         btn.setOnAction((ActionEvent event) -> {
                             RequestFullDto requestFullDto = getTableView().getItems().get(getIndex());
                             if(requestFullDto.getStatus().equals("approved")) {
-                                System.out.println("selectedData: " + requestFullDto);
+                                Navigate.execution(placeholder, requestFullDto.getSimulationName(), requestFullDto.getId());
                             }
                         });
                     }

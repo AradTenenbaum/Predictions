@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.pages.details.simulation.grid.GridController">
+   <children>
+      <StackPane prefHeight="150.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+         <children>
+            <Label text="Grid Size" />
+         </children>
+      </StackPane>
+      <HBox prefHeight="136.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
+         <children>
+            <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="rowLabel" text="Rows:" />
+               </children>
+            </StackPane>
+            <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="colLabel" text="Columns:" />
+               </children>
+            </StackPane>
+         </children>
+      </HBox>
+   </children>
+</VBox>

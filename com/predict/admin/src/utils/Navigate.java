@@ -7,7 +7,6 @@ import components.pages.management.simulation.actions.ActionDependencies;
 import components.pages.management.simulation.entity.EntityController;
 import components.pages.management.simulation.environment.EnvController;
 import components.pages.management.simulation.grid.GridController;
-import components.pages.management.simulation.termination.TerminationController;
 import engine.EntityDto;
 import engine.EnvironmentDto;
 import engine.GridDto;
@@ -33,7 +32,6 @@ public class Navigate {
     private final static String GRID_PATH = "/components/pages/management/simulation/grid/grid.fxml";
     private final static String ENVIRONMENT_PATH = "/components/pages/management/simulation/environment/environment.fxml";
     private final static String ENTITY_PATH = "/components/pages/management/simulation/entity/entity.fxml";
-    private static final String TERMINATION_PATH = "/components/pages/management/simulation/termination/termination.fxml";
 
     private static void fitParent(Pane parent, Pane child) {
         child.prefWidthProperty().bind(parent.widthProperty());
@@ -133,21 +131,6 @@ public class Navigate {
         }
     }
 
-    public static void termination(Pane placeholder, TerminationDto terminationDto) {
-        try {
-            FXMLLoader loader = new FXMLLoader(Navigate.class.getResource(TERMINATION_PATH));
-            VBox component = loader.load();
-            TerminationController terminationController = loader.getController();
-            terminationController.setCurrentTermination(terminationDto);
-            fitParent(placeholder, component);
-
-            placeholder.getChildren().setAll(component);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void environment(Pane placeholder, EnvironmentDto environmentDto) {
         try {

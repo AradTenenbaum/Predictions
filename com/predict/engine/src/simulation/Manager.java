@@ -64,12 +64,34 @@ public class Manager implements Serializable {
         environmentInstance.setProperty(property, fixedValue);
     }
 
+    public void addEnvVar(String property, String value) throws ValidationException {
+        Object fixedValue = value;
+        Validation.checkPropValid(currentWorld.getEnvironment().getProperties().get(property), value);
+        fixedValue = Convert.stringToType(value, currentWorld.getEnvironment().getProperties().get(property).getType());
+        environmentInstance.addProperty(property, currentWorld.getEnvironment().getProperties().get(property).getType(), fixedValue);
+    }
+
     public boolean isRandomEnvVar(String name) {
         return environmentInstance.isRandomProp(name);
     }
 
     public String getEnvValue(String property) {
         return environmentInstance.getProperty(property).getValue().toString();
+    }
+
+    public Simulation createSimulationFromReceived(Map<String, String> environment, Map<String, Integer> populations, World world) throws SimulationException {
+        setCurrentWorld(world);
+        setSharedWorld(new WorldDto(world));
+        environmentInstance = new EnvironmentInstanceImpl();
+        setPopulations(populations);
+        environment.forEach((name, value) -> {
+            try {
+                addEnvVar(name, value);
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return generateSimulation();
     }
 
     public Simulation generateSimulation() throws SimulationException {

@@ -32,6 +32,11 @@ public class EnvironmentInstanceImpl implements EnvironmentInstance {
     }
 
     @Override
+    public void addProperty(String name, String type, Object value) {
+        properties.put(name, new PropertyInstance(type, value));
+    }
+
+    @Override
     public void setProperty(String property, Object value) {
         this.properties.get(property).setValue(value);
     }

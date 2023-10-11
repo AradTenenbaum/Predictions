@@ -75,4 +75,9 @@ public class Request {
     public STATUS getStatus() {
         return status;
     }
+
+    public void runSimulationOnRequest() {
+        runs--;
+        if(runs == 0) status = STATUS.DONE;
+    }
 }

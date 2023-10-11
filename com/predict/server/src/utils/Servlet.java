@@ -37,6 +37,22 @@ public class Servlet {
         }
     }
 
+    public static void successWithMessage(HttpServletResponse resp, String message) {
+        resp.setContentType("application/json");
+
+        try (PrintWriter out = resp.getWriter()) {
+            Gson gson = new Gson();
+            resp.setStatus(HttpURLConnection.HTTP_OK);
+            MessageObject obj = new MessageObject("Success: " + message);
+            String json = gson.toJson(obj);
+            out.println(json);
+            out.flush();
+        } catch (IOException e) {
+            resp.setStatus(HttpURLConnection.HTTP_UNAVAILABLE);
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void successWithObject(HttpServletResponse resp, Object obj) {
         resp.setContentType("application/json");
 

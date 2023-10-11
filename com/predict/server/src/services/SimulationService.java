@@ -1,29 +1,39 @@
 package services;
 
+import def.Termination;
 import def.World;
+import engine.CreateSimulationDto;
+import engine.SimulationDto;
+import engine.TerminationDto;
 import engine.WorldDto;
+import engine.statistics.StatisticsDto;
+import simulation.Manager;
+import simulation.Simulation;
+import utils.Constants;
+import utils.exception.SimulationException;
 
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class SimulationService {
-    private ExecutorService executorService;
     private ThreadPoolExecutor threadPoolExecutor;
     private LinkedBlockingQueue tasks;
     private Map<String, World> worlds;
     private List<Request> requests;
+    private Map<String, Simulation> simulations;
+    private Manager manager;
 
     public SimulationService() {
         tasks = new LinkedBlockingQueue<>();
-        executorService = Executors.newFixedThreadPool(1);
         threadPoolExecutor = new ThreadPoolExecutor(1, Integer.MAX_VALUE, Integer.MAX_VALUE, TimeUnit.SECONDS, tasks);
         worlds = new HashMap<>();
         requests = new ArrayList<>();
+        manager = new Manager();
+        simulations = new HashMap<>();
     }
 
     public void setThreads(int number) {
-        this.executorService = Executors.newFixedThreadPool(number);
         threadPoolExecutor = new ThreadPoolExecutor(number, Integer.MAX_VALUE, Integer.MAX_VALUE, TimeUnit.SECONDS, tasks);
     }
 
@@ -77,5 +87,97 @@ public class SimulationService {
                 .forEach(request -> requestFullDtos.add(new RequestFullDto(request.getSimulationName(), request.getRuns(), request.getTicks(), request.getSeconds(), request.isStopByUser(), request.getUsername(), request.getId(), request.getStatus().getValue())));
 
         return requestFullDtos;
+    }
+
+    public void approveRequest(int id) {
+        Optional<Request> requestById = requests.stream().filter(request -> request.getId() == id).findFirst();
+        if(requestById.isPresent()) {
+            requestById.get().setStatus(Request.STATUS.APPROVED);
+        }
+    }
+
+    public void declineRequest(int id) {
+        Optional<Request> requestById = requests.stream().filter(request -> request.getId() == id).findFirst();
+        if(requestById.isPresent()) {
+            requestById.get().setStatus(Request.STATUS.DECLINED);
+        }
+    }
+
+    public boolean isUserOwnRequest(String username, int requestId) {
+        Optional<Request> requestById = requests.stream().filter(request -> request.getId() == requestId).findFirst();
+        return requestById.map(request -> request.getUsername().equals(username)).orElse(false);
+    }
+
+    public boolean isRequestApproved(int requestId) {
+        Optional<Request> requestById = requests.stream().filter(request -> request.getId() == requestId).findFirst();
+        return requestById.map(request -> request.getStatus().equals(Request.STATUS.APPROVED)).orElse(false);
+    }
+
+    public Simulation createSimulation(CreateSimulationDto createSimulationDto) throws SimulationException {
+        Optional<Request> requestById = requests.stream().filter(request -> request.getId() == createSimulationDto.getRequestId()).findFirst();
+        if(requestById.isPresent()) {
+            World world = worlds.get(requestById.get().getSimulationName());
+            Simulation s = manager.createSimulationFromReceived(createSimulationDto.getEnvironment(), createSimulationDto.getPopulations(), world);
+            s.setTermination(new Termination(requestById.get().getTicks(), requestById.get().getSeconds(), requestById.get().isStopByUser()));
+            s.setRequestId(requestById.get().getId());
+            requestById.get().runSimulationOnRequest();
+            return s;
+        } else {
+            return null;
+        }
+    }
+
+    public void runSimulation(Simulation s) {
+        simulations.put(s.getId().toString(), s);
+        threadPoolExecutor.execute(() -> {
+            while (s.isRun()) {
+                s.runTick();
+            }
+            System.out.println("Ended simulation " + s.getId());
+        });
+    }
+
+    public void stopSimulationById(String simulationId) {
+        Simulation s = simulations.get(simulationId);
+        s.stop();
+    }
+
+    public SimulationDto getSimulation(String simulationId) {
+        Simulation s = simulations.get(simulationId);
+        SimulationDto.MODES mode = (s.isStopped() ? SimulationDto.MODES.STATS : SimulationDto.MODES.RUNTIME);
+        return new SimulationDto((int) s.getRunTime(), s.getTicks(), s.getProgress(), s.getEntitiesPopulations(), mode, new StatisticsDto(), new TerminationDto(s.getTermination()));
+    }
+
+    public boolean isSimulationExists(String id) {
+        return simulations.containsKey(id);
+    }
+
+    public boolean isSimulationOwnedByUser(String username, String simulationId) {
+        if(isSimulationExists(simulationId)) {
+            int requestId = simulations.get(simulationId).getRequestId();
+            Optional<Request> requestById = requests.stream().filter(request -> request.getId() == requestId).findFirst();
+            if(requestById.isPresent()) return requestById.get().getUsername().equals(username);
+            return false;
+        }
+        return false;
+    }
+
+    public List<String> getUserSimulationIds(String username) {
+        List<String> simulationIds = new ArrayList<>();
+
+        simulations.forEach((s, simulation) -> {
+            if(username.equals(Constants.ADMIN)) {
+                simulationIds.add(s);
+            } else {
+                Optional<Request> requestById = requests.stream().filter(request -> request.getId() == simulation.getRequestId()).findFirst();
+                if(requestById.isPresent()) {
+                    if(requestById.get().getUsername().equals(username)) {
+                       simulationIds.add(s);
+                    }
+                }
+            }
+        });
+
+        return simulationIds;
     }
 }

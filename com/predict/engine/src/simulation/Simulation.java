@@ -37,6 +37,8 @@ public class Simulation implements Serializable {
     public enum STATUS {
         RUN, PAUSED, STOPPED
     }
+    private Termination termination;
+    private int requestId;
 
     public Simulation(Map<String, List<EntityInstance>> entities, WorldDto worldDto, World world, EnvironmentInstance environmentInstance, Grid grid, int worldVersion) {
         this.id = UUID.randomUUID();
@@ -60,6 +62,18 @@ public class Simulation implements Serializable {
         this.runTime = 0;
         this.ticks = 0;
         this.worldVersion = worldVersion;
+    }
+
+    public void setTermination(Termination termination) {
+        this.termination = termination;
+    }
+
+    public int getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(int requestId) {
+        this.requestId = requestId;
     }
 
     public void pause() {
@@ -113,7 +127,7 @@ public class Simulation implements Serializable {
     }
 
     public void checkStop() {
-        Termination termination = world.getTermination();
+//        Termination termination = world.getTermination();
         long duration = 1000L *termination.getSeconds();
         if(termination.getTicks() != -1 && ticks > termination.getTicks()) {
             stop();
@@ -125,7 +139,7 @@ public class Simulation implements Serializable {
 
     public double getProgress() {
         if(isStopped()) return 1;
-        Termination termination = world.getTermination();
+//        Termination termination = world.getTermination();
         if(termination.getTicks() != -1) {
             return ((double) ticks /termination.getTicks());
         }
@@ -258,8 +272,20 @@ public class Simulation implements Serializable {
         return id;
     }
 
+    public STATUS getStatus() {
+        return status;
+    }
+
     public Map<String, List<EntityInstance>> getEntities() {
         return entities;
+    }
+
+    public Map<String, Integer> getEntitiesPopulations() {
+        Map<String, Integer> entPopulations = new HashMap<>();
+        entities.forEach((s, entityInstances) -> {
+            entPopulations.put(s, (int) entityInstances.stream().filter(EntityInstance::getAlive).count());
+        });
+        return entPopulations;
     }
 
     public Termination.REASONS getTerminationReason() {
@@ -277,5 +303,9 @@ public class Simulation implements Serializable {
     public String getFormattedRunDate() {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy | HH.mm.ss");
         return formatter.format(runDate);
+    }
+
+    public Termination getTermination() {
+        return termination;
     }
 }

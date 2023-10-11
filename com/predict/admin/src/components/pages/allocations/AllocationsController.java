@@ -74,7 +74,9 @@ public class AllocationsController implements Initializable {
                     Platform.runLater(() -> ErrorDialog.send(messageObject.getMessage()));
                 } else {
                     requestFullDtos = HttpClientUtil.fromJsonToListOfRequestFullDto(response.body());
-                    setUpTableUI();
+                    Platform.runLater(() -> {
+                        setUpTableUI();
+                    });
                 }
                 response.body().close();
             }
@@ -99,6 +101,25 @@ public class AllocationsController implements Initializable {
                 new PropertyValueFactory<RequestFullDto, String>("username")
         );
 
+        terCol.setCellValueFactory(
+                param -> {
+                    String terminationRules = "";
+                    if(param.getValue().isStopByUser()) {
+                        terminationRules += "Stop by user";
+                    }
+                    if(param.getValue().getSeconds() != -1) {
+                        if(!terminationRules.equals("")) terminationRules += " | ";
+                        terminationRules += (param.getValue().getSeconds() + " Seconds");
+                    }
+                    if(param.getValue().getTicks() != -1) {
+                        if(!terminationRules.equals("")) terminationRules += " | ";
+                        terminationRules += (param.getValue().getTicks() + " Ticks");
+                    }
+
+                    return new SimpleStringProperty(terminationRules);
+                }
+        );
+
         javafx.util.Callback<TableColumn<RequestFullDto, Void>, TableCell<RequestFullDto, Void>> cellFactoryApprove = new javafx.util.Callback<TableColumn<RequestFullDto, Void>, TableCell<RequestFullDto, Void>>() {
             @Override
             public TableCell<RequestFullDto, Void> call(final TableColumn<RequestFullDto, Void> param) {
@@ -109,7 +130,25 @@ public class AllocationsController implements Initializable {
                     {
                         btn.setOnAction((ActionEvent event) -> {
                             RequestFullDto requestFullDto = getTableView().getItems().get(getIndex());
+                            if(requestFullDto.getStatus().equals("waiting")) {
+                                HttpClientUtil.runAsyncGet((Constants.REQUEST_APPROVE_URL + "?id=" + requestFullDto.getId()), new Callback() {
+                                    @Override
+                                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                                        Platform.runLater(() -> ErrorDialog.send(e.getMessage()));
+                                    }
 
+                                    @Override
+                                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                                        if(response.code() != HttpURLConnection.HTTP_OK) {
+                                            MessageObject messageObject = (MessageObject)HttpClientUtil.fromJsonToObject(response.body(), new MessageObject(""));
+                                            Platform.runLater(() -> ErrorDialog.send(messageObject.getMessage()));
+                                        } else {
+                                            fetchRequests();
+                                        }
+                                        response.body().close();
+                                    }
+                                });
+                            }
                         });
                     }
 
@@ -138,7 +177,25 @@ public class AllocationsController implements Initializable {
                     {
                         btn.setOnAction((ActionEvent event) -> {
                             RequestFullDto requestFullDto = getTableView().getItems().get(getIndex());
+                            if(requestFullDto.getStatus().equals("waiting")) {
+                                HttpClientUtil.runAsyncGet((Constants.REQUEST_DECLINE_URL + "?id=" + requestFullDto.getId()), new Callback() {
+                                    @Override
+                                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                                        Platform.runLater(() -> ErrorDialog.send(e.getMessage()));
+                                    }
 
+                                    @Override
+                                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                                        if(response.code() != HttpURLConnection.HTTP_OK) {
+                                            MessageObject messageObject = (MessageObject)HttpClientUtil.fromJsonToObject(response.body(), new MessageObject(""));
+                                            Platform.runLater(() -> ErrorDialog.send(messageObject.getMessage()));
+                                        } else {
+                                            fetchRequests();
+                                        }
+                                        response.body().close();
+                                    }
+                                });
+                            }
                         });
                     }
 
