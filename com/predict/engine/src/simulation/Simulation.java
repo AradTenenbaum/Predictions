@@ -263,6 +263,13 @@ public class Simulation implements Serializable {
 
     public void runTick() {
         if(isRun()) {
+            if(world.isSleep()) {
+                try {
+                    Thread.sleep(world.getSleep());
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             runOneTick();
         }
     }

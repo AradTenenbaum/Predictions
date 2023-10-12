@@ -6,6 +6,8 @@ import errors.ErrorDialog;
 import generic.MessageObject;
 import generic.functions.Validation;
 import http.HttpClientUtil;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -17,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import services.RequestDto;
@@ -248,5 +251,13 @@ public class RequestsController implements Initializable {
         requestFullDtos = new ArrayList<>();
         fetchSimulationOptions();
         fetchRequests();
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), event -> {
+                    fetchRequests();
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
 }

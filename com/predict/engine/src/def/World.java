@@ -26,6 +26,14 @@ public class World implements Serializable {
         this.sleep = Optional.ofNullable(sleep);
     }
 
+    public boolean isSleep() {
+        return sleep.isPresent();
+    }
+
+    public Integer getSleep() {
+        return sleep.get();
+    }
+
     public String getName() {
         return name;
     }

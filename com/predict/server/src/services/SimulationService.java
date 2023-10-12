@@ -42,11 +42,13 @@ public class SimulationService {
         threadPoolExecutor = new ThreadPoolExecutor(number, Integer.MAX_VALUE, Integer.MAX_VALUE, TimeUnit.SECONDS, tasks);
     }
 
-    public void getThreads() {
-        System.out.println(threadPoolExecutor);
-        threadPoolExecutor.getQueue().forEach(runnable -> {
-            System.out.println(runnable);
+    public List<String> getThreads() {
+        List<String> simulationsInQueue = new ArrayList<>();
+        tasks.forEach(item -> {
+            RunSimulationThread runSimulationThread = (RunSimulationThread)item;
+            simulationsInQueue.add(runSimulationThread.getSimulation().getId().toString());
         });
+        return simulationsInQueue;
     }
 
     public void addWorld(World newWorld) {
@@ -134,12 +136,8 @@ public class SimulationService {
 
     public void runSimulation(Simulation s) {
         simulations.put(s.getId().toString(), s);
-        threadPoolExecutor.execute(() -> {
-            while (!s.isStopped()) {
-                s.runTick();
-            }
-            System.out.println("Ended simulation " + s.getId());
-        });
+        RunSimulationThread runSimulationThread = new RunSimulationThread(s);
+        threadPoolExecutor.execute(runSimulationThread);
     }
 
     public void stopSimulationById(String simulationId) {
@@ -183,7 +181,11 @@ public class SimulationService {
         Simulation s = simulations.get(simulationId);
         SimulationDto.MODES mode = (s.isStopped() ? SimulationDto.MODES.STATS : SimulationDto.MODES.RUNTIME);
         StatisticsDto statisticsDto = (s.isStopped() ? buildStatisticsDto(s.getStatistics()) : new StatisticsDto());
-        return new SimulationDto(s.getId(), (int) s.getRunTime(), s.getTicks(), s.getProgress(), s.getEntitiesPopulations(), mode, statisticsDto, new TerminationDto(s.getTermination()));
+        Map<String, String> envValues = new HashMap<>();
+        s.getEnvironmentInstance().getProperties().forEach((propName, propertyInstance) -> {
+            envValues.put(propName, String.valueOf(propertyInstance.getValue()));
+        });
+        return new SimulationDto(s.getId(), (int) s.getRunTime(), s.getTicks(), s.getProgress(), s.getEntitiesPopulations(), mode, statisticsDto, new TerminationDto(s.getTermination()), envValues);
     }
 
     public boolean isSimulationExists(String id) {

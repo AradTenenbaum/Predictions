@@ -6,9 +6,20 @@ import java.util.Optional;
 
 public class UserService {
     private List<String> users;
-
+    private boolean isAdminConnected;
     public UserService() {
         users = new ArrayList<>();
+        isAdminConnected = false;
+    }
+
+    public void adminConnected() {
+        isAdminConnected = true;
+    }
+
+    public void adminLogout() {isAdminConnected = false;}
+
+    public boolean isAdminConnected() {
+        return isAdminConnected;
     }
 
     public boolean isUserExists(String username) {

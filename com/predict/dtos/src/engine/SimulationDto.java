@@ -16,11 +16,12 @@ public class SimulationDto {
     private int ticks;
     private double progress;
     private Map<String, Integer> populations;
+    private Map<String, String> envValues;
     private MODES mode;
     private StatisticsDto statistics;
     private TerminationDto terminationDto;
 
-    public SimulationDto(UUID id, int runTimeSeconds, int ticks, double progress, Map<String, Integer> populations, MODES mode, StatisticsDto statistics, TerminationDto terminationDto) {
+    public SimulationDto(UUID id, int runTimeSeconds, int ticks, double progress, Map<String, Integer> populations, MODES mode, StatisticsDto statistics, TerminationDto terminationDto, Map<String, String> envValues) {
         this.id = id;
         this.runTimeSeconds = runTimeSeconds;
         this.ticks = ticks;
@@ -29,6 +30,7 @@ public class SimulationDto {
         this.mode = mode;
         this.statistics = statistics;
         this.terminationDto = terminationDto;
+        this.envValues = envValues;
     }
 
     public UUID getId() {
@@ -66,5 +68,9 @@ public class SimulationDto {
 
     public TerminationDto getTerminationDto() {
         return terminationDto;
+    }
+
+    public Map<String, String> getEnvValues() {
+        return envValues;
     }
 }

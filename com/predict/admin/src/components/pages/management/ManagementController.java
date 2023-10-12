@@ -6,6 +6,8 @@ import engine.actions.ActionDto;
 import errors.ErrorDialog;
 import generic.MessageObject;
 import http.HttpClientUtil;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -14,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import utils.Constants;
@@ -36,7 +39,7 @@ public class ManagementController {
     private TreeItem<String> rootItem;
 
     @FXML
-    private ListView<?> threadPoolList;
+    private ListView<String> threadPoolList;
 
     private SimpleStringProperty filePathProp;
 
@@ -46,6 +49,7 @@ public class ManagementController {
 
     ManagementDependencies managementDependencies;
     private Map<String, List<ActionDto>> actionsToRulesList;
+    private List<String> runningSimulations;
 
     @FXML
     private Pane detailsDisplay;
@@ -56,6 +60,7 @@ public class ManagementController {
         rootItem = new TreeItem<>("Worlds");
         worlds = new ArrayList<>();
         actionsToRulesList = new HashMap<>();
+        runningSimulations = new ArrayList<>();
     }
 
     @FXML
@@ -170,6 +175,40 @@ public class ManagementController {
     private void initialize() {
         filePathLabel.textProperty().bind(filePathProp);
         loadWorlds();
+        loadThreads();
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), event -> {
+                    loadThreads();
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+    private void updateThreadsInUI() {
+        threadPoolList.getItems().setAll(runningSimulations);
+    }
+
+    private void loadThreads() {
+        HttpClientUtil.runAsyncGet(Constants.THREADS_URL, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() -> ErrorDialog.send(e.getMessage()));
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.code() != HttpURLConnection.HTTP_OK) {
+                    MessageObject messageObject = (MessageObject)HttpClientUtil.fromJsonToObject(response.body(), new MessageObject(""));
+                    Platform.runLater(() -> ErrorDialog.send(messageObject.getMessage()));
+                } else {
+                    runningSimulations = (List<String>) HttpClientUtil.fromJsonToObject(response.body(), runningSimulations);
+                    Platform.runLater(() -> updateThreadsInUI());
+                }
+                response.body().close();
+            }
+        });
     }
 
     private void setThreadsDialog() {

@@ -12,20 +12,18 @@ import utils.Servlet;
 
 import java.io.IOException;
 
-@WebServlet(name = "AdminServlet", urlPatterns = {"/admin"})
-public class AdminServlet extends HttpServlet {
+@WebServlet(name = "AdminLogoutServlet", urlPatterns = {"/admin/logout"})
+public class AdminLogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        UserService userService = Servlet.getUserService(getServletContext());
-
-        if(userService.isAdminConnected()) {
-            Servlet.forbidden(resp);
+        if(!Auth.admin(req, resp)) {
             return;
-        } else {
-            userService.adminConnected();
         }
 
-        req.getSession(true).setAttribute(Constants.USERNAME, Constants.ADMIN);
+        UserService userService = Servlet.getUserService(getServletContext());
+
+        userService.adminLogout();
+
         Servlet.success(resp);
     }
 }

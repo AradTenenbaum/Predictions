@@ -3,6 +3,8 @@ package components.pages.allocations;
 import errors.ErrorDialog;
 import generic.MessageObject;
 import http.HttpClientUtil;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -15,6 +17,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Duration;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -226,5 +229,13 @@ public class AllocationsController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         requestFullDtos = new ArrayList<>();
         fetchRequests();
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), event -> {
+                    fetchRequests();
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
 }

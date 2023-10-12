@@ -40,8 +40,6 @@ public class StatisticsController implements Initializable {
     private List<SimpleItem> tableStatisticsItems;
     @FXML
     private StackPane graphPlaceholder;
-    @FXML
-    private Button rerunBtn;
     private SimulationDto simulationDto;
 
 
@@ -144,11 +142,6 @@ public class StatisticsController implements Initializable {
                 }
             }
         }
-    }
-
-    @FXML
-    void rerunSimulation(ActionEvent event) {
-
     }
 
     @Override

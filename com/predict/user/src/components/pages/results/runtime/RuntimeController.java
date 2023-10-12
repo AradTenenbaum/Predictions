@@ -65,6 +65,8 @@ public class RuntimeController implements Initializable {
     private List<SimpleItem> tableItems;
 
     private SimulationDto simulationDto;
+    @FXML
+    private ListView<String> envListView;
 
     public RuntimeController() {
         runTimeProp = new SimpleLongProperty();
@@ -99,8 +101,13 @@ public class RuntimeController implements Initializable {
                         tableItems
                 );
 
+
         entitiesAmountsTable.setItems(data);
         displayOnConsumers();
+        envListView.getItems().clear();
+        simulationDto.getEnvValues().forEach((s, s2) -> {
+            envListView.getItems().add(s + ": " + s2);
+        });
     }
 
     public void displayOnConsumers() {
@@ -125,11 +132,6 @@ public class RuntimeController implements Initializable {
         runtimeVal.textProperty().bind(Bindings.format("%d sec", runTimeProp));
         ticksVal.textProperty().bind(Bindings.format("%d", ticksProp));
         progressBar.progressProperty().bind(progressProp);
-//        progressProp.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {
-//            if(newValue.equals(1.0)) {
-//                loadStatistics(currentSimulation);
-//            }
-//        }));
     }
 
     @FXML

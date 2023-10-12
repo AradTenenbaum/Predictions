@@ -65,10 +65,14 @@ public class Manager implements Serializable {
     }
 
     public void addEnvVar(String property, String value) throws ValidationException {
-        Object fixedValue = value;
-        Validation.checkPropValid(currentWorld.getEnvironment().getProperties().get(property), value);
-        fixedValue = Convert.stringToType(value, currentWorld.getEnvironment().getProperties().get(property).getType());
-        environmentInstance.addProperty(property, currentWorld.getEnvironment().getProperties().get(property).getType(), fixedValue);
+        if(value.equals("RANDOM")) {
+            environmentInstance.addRandomProperty(property, currentWorld.getEnvironment().getProperties().get(property).getType());
+        } else {
+            Object fixedValue = value;
+            Validation.checkPropValid(currentWorld.getEnvironment().getProperties().get(property), value);
+            fixedValue = Convert.stringToType(value, currentWorld.getEnvironment().getProperties().get(property).getType());
+            environmentInstance.addProperty(property, currentWorld.getEnvironment().getProperties().get(property).getType(), fixedValue);
+        }
     }
 
     public boolean isRandomEnvVar(String name) {

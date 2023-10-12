@@ -10,6 +10,7 @@ import utils.Auth;
 import utils.Servlet;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "ThreadServlet", urlPatterns = {"/simulation/thread"})
 public class ThreadServlet extends HttpServlet {
@@ -30,12 +31,17 @@ public class ThreadServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        if(!Auth.admin(req, resp)) {
-            return;
-        }
-        SimulationService simulationService = Servlet.getSimulationService(getServletContext());
+        try {
+            if(!Auth.admin(req, resp)) {
+                return;
+            }
+            SimulationService simulationService = Servlet.getSimulationService(getServletContext());
 
-        simulationService.getThreads();
-        Servlet.success(resp);
+            List<String> simulationsInQueue = simulationService.getThreads();
+
+            Servlet.successWithObject(resp, simulationsInQueue);
+        } catch (Exception e) {
+            Servlet.generalError(resp);
+        }
     }
 }

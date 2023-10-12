@@ -6,6 +6,8 @@ import engine.actions.ActionDto;
 import errors.ErrorDialog;
 import generic.MessageObject;
 import http.HttpClientUtil;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,6 +15,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -99,6 +102,13 @@ public class DetailsController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadWorlds();
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), event -> {
+                    loadWorlds();
+                })
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
 
     private boolean isAction(String value) {
