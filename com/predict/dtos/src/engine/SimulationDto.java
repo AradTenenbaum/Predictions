@@ -5,8 +5,10 @@ import simulation.Simulation;
 import simulation.statistics.Statistics;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class SimulationDto {
+    private UUID id;
     public enum MODES {
         RUNTIME, STATS
     }
@@ -18,7 +20,8 @@ public class SimulationDto {
     private StatisticsDto statistics;
     private TerminationDto terminationDto;
 
-    public SimulationDto(int runTimeSeconds, int ticks, double progress, Map<String, Integer> populations, MODES mode, StatisticsDto statistics, TerminationDto terminationDto) {
+    public SimulationDto(UUID id, int runTimeSeconds, int ticks, double progress, Map<String, Integer> populations, MODES mode, StatisticsDto statistics, TerminationDto terminationDto) {
+        this.id = id;
         this.runTimeSeconds = runTimeSeconds;
         this.ticks = ticks;
         this.progress = progress;
@@ -26,6 +29,10 @@ public class SimulationDto {
         this.mode = mode;
         this.statistics = statistics;
         this.terminationDto = terminationDto;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public SimulationDto() {

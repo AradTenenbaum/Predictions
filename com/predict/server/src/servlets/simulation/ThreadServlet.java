@@ -16,7 +16,9 @@ public class ThreadServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            Auth.admin(req, resp);
+            if(!Auth.admin(req, resp)) {
+                return;
+            }
             Integer num = (Integer)Servlet.fromJsonToObject(req.getReader(), new Integer(0));
             SimulationService simulationService = Servlet.getSimulationService(getServletContext());
             simulationService.setThreads(num);
@@ -28,7 +30,9 @@ public class ThreadServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        Auth.admin(req, resp);
+        if(!Auth.admin(req, resp)) {
+            return;
+        }
         SimulationService simulationService = Servlet.getSimulationService(getServletContext());
 
         simulationService.getThreads();

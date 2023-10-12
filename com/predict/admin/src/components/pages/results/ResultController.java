@@ -77,11 +77,7 @@ public class ResultController implements Initializable {
     }
 
     private void displaySimulation(SimulationDto simulationDto) {
-        if(simulationDto.isOnRuntimeMode()) {
-            Navigate.runtime(placeholder, simulationPlaceholder, simulationDto);
-        } else if(simulationDto.isOnStatsMode()) {
-            Navigate.statistics(simulationPlaceholder, simulationDto);
-        }
+        Navigate.statistics(simulationPlaceholder, simulationDto);
     }
 
     private void fetchSimulation(String simulationId) {

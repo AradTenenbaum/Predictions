@@ -1,6 +1,6 @@
 package simulation.statistics;
 
-import utils.object.Point;
+import generic.objects.Point;
 import utils.object.Position;
 
 import java.util.ArrayList;

@@ -31,5 +31,6 @@
     </orderEntry>
     <orderEntry type="module" module-name="dtos" />
     <orderEntry type="module" module-name="engine" />
+    <orderEntry type="module" module-name="globals" />
   </component>
 </module>

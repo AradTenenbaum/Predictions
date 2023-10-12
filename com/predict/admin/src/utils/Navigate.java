@@ -7,10 +7,8 @@ import components.pages.management.simulation.actions.ActionDependencies;
 import components.pages.management.simulation.entity.EntityController;
 import components.pages.management.simulation.environment.EnvController;
 import components.pages.management.simulation.grid.GridController;
-import engine.EntityDto;
-import engine.EnvironmentDto;
-import engine.GridDto;
-import engine.TerminationDto;
+import components.pages.results.statistics.StatisticsController;
+import engine.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
@@ -27,7 +25,8 @@ import java.util.Collection;
 public class Navigate {
     private final static String MANAGEMENT_PATH = "/components/pages/management/management.fxml";
     private final static String ALLOCATIONS_PATH = "/components/pages/allocations/allocations.fxml";
-    private final static String EXECUTION_HISTORY_PATH = "/components/pages/exechistory/exechistory.fxml";
+    private final static String EXECUTION_HISTORY_PATH = "/components/pages/results/results.fxml";
+    private final static String STATISTICS_PATH = "/components/pages/results/statistics/statistics.fxml";
     private final static String ACTION_PATH = "/components/pages/management/simulation/actions/action.fxml";
     private final static String GRID_PATH = "/components/pages/management/simulation/grid/grid.fxml";
     private final static String ENVIRONMENT_PATH = "/components/pages/management/simulation/environment/environment.fxml";
@@ -157,6 +156,23 @@ public class Navigate {
             fitParent(component, (VBox) component.getChildren().get(0));
 
             placeholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void statistics(VBox simulationPlaceholder, SimulationDto simulationDto) {
+        try {
+            FXMLLoader loader = new FXMLLoader(Navigate.class.getResource(STATISTICS_PATH));
+            Pane component = loader.load();
+            StatisticsController statisticsController = loader.getController();
+            statisticsController.setSimulationDto(simulationDto);
+
+            fitParent(simulationPlaceholder, component);
+
+            simulationPlaceholder.getChildren().setAll(component);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {

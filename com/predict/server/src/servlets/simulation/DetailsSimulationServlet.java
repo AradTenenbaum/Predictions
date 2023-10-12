@@ -1,5 +1,6 @@
 package servlets.simulation;
 
+import engine.SimulationDto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,6 +19,7 @@ public class DetailsSimulationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             String username = Auth.user(req, resp);
+            if(username == null) return;
 
             SimulationService simulationService = Servlet.getSimulationService(getServletContext());
             String simulationId = req.getParameter("id");
@@ -25,15 +27,20 @@ public class DetailsSimulationServlet extends HttpServlet {
             // check if simulation exists
             if(!simulationService.isSimulationExists(simulationId)) {
                 Servlet.errorMessage(resp, "No such simulation");
+                return;
             }
 
             // check if the user owns the simulation
             if(!simulationService.isSimulationOwnedByUser(username, simulationId) && !username.equals(Constants.ADMIN)) {
                 Servlet.forbidden(resp);
+                return;
             }
 
-            Servlet.successWithObject(resp, simulationService.getSimulation(simulationId));
+            SimulationDto simulationDto = simulationService.getSimulation(simulationId);
+
+            Servlet.successWithObject(resp, simulationDto);
         } catch (Exception e) {
+            e.printStackTrace();
             Servlet.generalError(resp);
         }
     }

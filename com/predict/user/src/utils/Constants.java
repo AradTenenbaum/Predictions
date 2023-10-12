@@ -6,6 +6,9 @@ public class Constants {
     public static final String REGISTER_URL = HOST_URL + "/register?username=";
     public static final String SIMULATION_URL = HOST_URL + "/simulation";
     public static final String SIMULATION_RUN_URL = SIMULATION_URL + "/run";
+    public static final String SIMULATION_STOP_URL = SIMULATION_URL + "/stop";
+    public static final String SIMULATION_PAUSE_URL = SIMULATION_URL + "/pause";
+    public static final String SIMULATION_PLAY_URL = SIMULATION_URL + "/play";
     public static final String SIMULATION_DETAILS_URL = SIMULATION_URL + "/details";
     public static final String REQUEST_URL = HOST_URL + "/request";
 }

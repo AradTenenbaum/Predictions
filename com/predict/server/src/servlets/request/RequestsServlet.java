@@ -19,6 +19,7 @@ public class RequestsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = Auth.user(req, resp);
+        if(username == null) return;
 
         try {
             RequestDto requestDto = (RequestDto) Servlet.fromJsonToObject(req.getReader(), new RequestDto());
@@ -55,6 +56,7 @@ public class RequestsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = Auth.user(req, resp);
+        if(username == null) return;
 
         try {
             SimulationService simulationService = Servlet.getSimulationService(getServletContext());

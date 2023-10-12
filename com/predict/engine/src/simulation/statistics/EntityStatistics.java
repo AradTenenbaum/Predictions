@@ -1,6 +1,6 @@
 package simulation.statistics;
 
-import utils.object.Point;
+import generic.objects.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;

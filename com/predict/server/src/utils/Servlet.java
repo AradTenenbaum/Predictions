@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import engine.WorldDto;
 import generic.*;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import services.SimulationService;
 import services.UserService;
@@ -160,5 +161,25 @@ public class Servlet {
         }
         Gson gson = new Gson();
         return gson.fromJson(requestBody.toString(), obj.getClass());
+    }
+
+    public static boolean simulationActionValidation(HttpServletRequest req, HttpServletResponse resp, String simulationId, SimulationService simulationService) {
+        String username = Auth.user(req, resp);
+        if(username == null) return false;
+
+
+        // check if simulation exists
+        if(!simulationService.isSimulationExists(simulationId)) {
+            Servlet.errorMessage(resp, "No such simulation");
+            return false;
+        }
+
+        // check if the user owns the simulation
+        if(!simulationService.isSimulationOwnedByUser(username, simulationId)) {
+            Servlet.forbidden(resp);
+            return false;
+        }
+
+        return true;
     }
 }

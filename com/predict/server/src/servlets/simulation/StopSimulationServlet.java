@@ -16,19 +16,10 @@ public class StopSimulationServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            String username = Auth.user(req, resp);
             SimulationService simulationService = Servlet.getSimulationService(getServletContext());
             String simulationId = req.getParameter("id");
 
-            // check if simulation exists
-            if(!simulationService.isSimulationExists(simulationId)) {
-                Servlet.errorMessage(resp, "No such simulation");
-            }
-
-            // check if the user owns the simulation
-            if(!simulationService.isSimulationOwnedByUser(username, simulationId)) {
-                Servlet.forbidden(resp);
-            }
+            if(!Servlet.simulationActionValidation(req, resp, simulationId, simulationService)) return;
 
             // stop simulation
             simulationService.stopSimulationById(simulationId);

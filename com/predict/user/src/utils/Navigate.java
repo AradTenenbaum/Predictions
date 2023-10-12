@@ -11,6 +11,7 @@ import components.pages.execution.ExecutionController;
 import components.pages.requests.RequestsController;
 import components.pages.results.ResultController;
 import components.pages.results.runtime.RuntimeController;
+import components.pages.results.statistics.StatisticsController;
 import engine.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -30,6 +31,7 @@ public class Navigate {
     private final static String EXECUTION_PATH = "/components/pages/execution/execution.fxml";
     private final static String RESULTS_PATH = "/components/pages/results/results.fxml";
     private final static String RUNTIME_PATH = "/components/pages/results/runtime/runtime.fxml";
+    private final static String STATISTICS_PATH = "/components/pages/results/statistics/statistics.fxml";
     private final static String ACTION_PATH = "/components/pages/details/simulation/actions/action.fxml";
     private final static String GRID_PATH = "/components/pages/details/simulation/grid/grid.fxml";
     private final static String ENVIRONMENT_PATH = "/components/pages/details/simulation/environment/environment.fxml";
@@ -207,6 +209,23 @@ public class Navigate {
             runtimeController.setPlaceholder(placeholder);
             runtimeController.setSimulationPlaceholder(simulationPlaceholder);
             runtimeController.setSimulationDto(simulationDto);
+
+            fitParent(simulationPlaceholder, component);
+
+            simulationPlaceholder.getChildren().setAll(component);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void statistics(VBox simulationPlaceholder, SimulationDto simulationDto) {
+        try {
+            FXMLLoader loader = new FXMLLoader(Navigate.class.getResource(STATISTICS_PATH));
+            Pane component = loader.load();
+            StatisticsController statisticsController = loader.getController();
+            statisticsController.setSimulationDto(simulationDto);
 
             fitParent(simulationPlaceholder, component);
 

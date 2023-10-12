@@ -16,7 +16,9 @@ public class RequestDeclineServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            Auth.admin(req, resp);
+            if(!Auth.admin(req, resp)) {
+                return;
+            }
             Integer requestId = Integer.valueOf(req.getParameter("id"));
             SimulationService simulationService = Servlet.getSimulationService(getServletContext());
             simulationService.declineRequest(requestId);

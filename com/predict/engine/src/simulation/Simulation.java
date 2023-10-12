@@ -12,7 +12,7 @@ import simulation.statistics.Statistics;
 import utils.exception.SimulationException;
 import utils.func.RandomGenerator;
 import utils.object.Grid;
-import utils.object.Point;
+import generic.objects.Point;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;

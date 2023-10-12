@@ -6,14 +6,19 @@ import engine.CreateSimulationDto;
 import engine.SimulationDto;
 import engine.TerminationDto;
 import engine.WorldDto;
+import engine.statistics.EntityStatisticsDto;
+import engine.statistics.PropertyStatisticsDto;
 import engine.statistics.StatisticsDto;
+import generic.objects.Point;
 import simulation.Manager;
 import simulation.Simulation;
+import simulation.statistics.Statistics;
 import utils.Constants;
 import utils.exception.SimulationException;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class SimulationService {
@@ -130,7 +135,7 @@ public class SimulationService {
     public void runSimulation(Simulation s) {
         simulations.put(s.getId().toString(), s);
         threadPoolExecutor.execute(() -> {
-            while (s.isRun()) {
+            while (!s.isStopped()) {
                 s.runTick();
             }
             System.out.println("Ended simulation " + s.getId());
@@ -142,10 +147,43 @@ public class SimulationService {
         s.stop();
     }
 
+    public void pauseSimulationById(String simulationId) {
+        Simulation s = simulations.get(simulationId);
+        s.pause();
+    }
+
+    public void playSimulationById(String simulationId) {
+        Simulation s = simulations.get(simulationId);
+        s.resume();
+    }
+
+    private StatisticsDto buildStatisticsDto(Statistics statistics) {
+        Map<String, EntityStatisticsDto> entityStatisticsDto = new HashMap<>();
+        statistics.getEntityStatistics().forEach((entName, entityStatistics) -> {
+            Map<String, PropertyStatisticsDto> propertiesStatisticsDto = new HashMap<>();
+            entityStatistics.getPropertyStatistics().forEach((propName, propertyStatistics) -> {
+                propertiesStatisticsDto.put(propName, new PropertyStatisticsDto(propertyStatistics.getEntAmountPerValue(), propertyStatistics.getAverageValue(), propertyStatistics.getAverageChangeTicks(), propertyStatistics.isNumeric()));
+            });
+            List<Point> smallEntityAmountInTimelineList = new ArrayList<>();
+            int every = entityStatistics.getAmountInTimeline().size()/20;
+            AtomicInteger i = new AtomicInteger();
+
+            entityStatistics.getAmountInTimeline().forEach(point -> {
+                if(i.get()%every == 0) {
+                    smallEntityAmountInTimelineList.add(point);
+                }
+                i.getAndIncrement();
+            });
+            entityStatisticsDto.put(entName, new EntityStatisticsDto(entityStatistics.getAliveAmount(), entityStatistics.getDeadAmount(),smallEntityAmountInTimelineList, propertiesStatisticsDto));
+        });
+        return new StatisticsDto(entityStatisticsDto);
+    }
+
     public SimulationDto getSimulation(String simulationId) {
         Simulation s = simulations.get(simulationId);
         SimulationDto.MODES mode = (s.isStopped() ? SimulationDto.MODES.STATS : SimulationDto.MODES.RUNTIME);
-        return new SimulationDto((int) s.getRunTime(), s.getTicks(), s.getProgress(), s.getEntitiesPopulations(), mode, new StatisticsDto(), new TerminationDto(s.getTermination()));
+        StatisticsDto statisticsDto = (s.isStopped() ? buildStatisticsDto(s.getStatistics()) : new StatisticsDto());
+        return new SimulationDto(s.getId(), (int) s.getRunTime(), s.getTicks(), s.getProgress(), s.getEntitiesPopulations(), mode, statisticsDto, new TerminationDto(s.getTermination()));
     }
 
     public boolean isSimulationExists(String id) {
@@ -167,7 +205,9 @@ public class SimulationService {
 
         simulations.forEach((s, simulation) -> {
             if(username.equals(Constants.ADMIN)) {
-                simulationIds.add(s);
+                if(simulation.isStopped()) {
+                    simulationIds.add(s);
+                }
             } else {
                 Optional<Request> requestById = requests.stream().filter(request -> request.getId() == simulation.getRequestId()).findFirst();
                 if(requestById.isPresent()) {

@@ -32,7 +32,9 @@ import java.util.stream.Collectors;
 public class SimulationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Auth.admin(req, resp);
+        if(!Auth.admin(req, resp)) {
+            return;
+        }
         SimulationService simulationService = Servlet.getSimulationService(getServletContext());
 
         Collection<Part> parts = req.getParts();
@@ -59,51 +61,56 @@ public class SimulationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Auth.user(req, resp);
+        try {
+            String username = Auth.user(req, resp);
+            if(username == null) return;
 
-        String world = req.getParameter("world");
-        String action = req.getParameter("action");
-        String actionIndex = req.getParameter("actionIndex");
-        String rule = req.getParameter("rule");
+            String world = req.getParameter("world");
+            String action = req.getParameter("action");
+            String actionIndex = req.getParameter("actionIndex");
+            String rule = req.getParameter("rule");
 
-        SimulationService simulationService = Servlet.getSimulationService(getServletContext());
+            SimulationService simulationService = Servlet.getSimulationService(getServletContext());
 
-        List<WorldDto> worldDtos = simulationService.getWorldDtos();
+            List<WorldDto> worldDtos = simulationService.getWorldDtos();
 
-        if(world != null) {
-            Optional<WorldDto> worldDto = worldDtos.stream().filter(wdto -> wdto.getName().equals(world)).findFirst();
-            if(worldDto.isPresent()) {
-                if(rule != null) {
-                    Optional<RuleDto> ruleDto = worldDto.get().getRules().stream().filter(rdto -> rdto.getName().equals(rule)).findFirst();
-                    if(ruleDto.isPresent()){
-                        if(action != null && actionIndex != null) {
-                            if(Validation.isInteger(actionIndex)) {
-                                int index = Convert.stringToInteger(actionIndex);
-                                List<ActionDto> actionDto = ruleDto.get().getActions().stream().filter(adto -> adto.getType().equals(action)).collect(Collectors.toList());
-                                if(actionDto.get(index) != null) {
-                                    Servlet.successWithObject(resp, actionDto.get(index));
+            if(world != null) {
+                Optional<WorldDto> worldDto = worldDtos.stream().filter(wdto -> wdto.getName().equals(world)).findFirst();
+                if(worldDto.isPresent()) {
+                    if(rule != null) {
+                        Optional<RuleDto> ruleDto = worldDto.get().getRules().stream().filter(rdto -> rdto.getName().equals(rule)).findFirst();
+                        if(ruleDto.isPresent()){
+                            if(action != null && actionIndex != null) {
+                                if(Validation.isInteger(actionIndex)) {
+                                    int index = Convert.stringToInteger(actionIndex);
+                                    List<ActionDto> actionDto = ruleDto.get().getActions().stream().filter(adto -> adto.getType().equals(action)).collect(Collectors.toList());
+                                    if(actionDto.get(index) != null) {
+                                        Servlet.successWithObject(resp, actionDto.get(index));
+                                    } else {
+                                        Servlet.notFound(resp);
+                                    }
                                 } else {
                                     Servlet.notFound(resp);
                                 }
-                            } else {
-                                Servlet.notFound(resp);
-                            }
 
+                            } else {
+                                Servlet.successWithObject(resp, ruleDto.get());
+                            }
                         } else {
-                            Servlet.successWithObject(resp, ruleDto.get());
+                            Servlet.notFound(resp);
                         }
                     } else {
-                        Servlet.notFound(resp);
+                        Servlet.successWithObject(resp, worldDto.get());
                     }
                 } else {
-                    Servlet.successWithObject(resp, worldDto.get());
+                    Servlet.notFound(resp);
                 }
-            } else {
-                Servlet.notFound(resp);
             }
-        }
-        else {
-            Servlet.successWithObject(resp, worldDtos);
+            else {
+                Servlet.successWithObject(resp, worldDtos);
+            }
+        } catch (Exception e) {
+            Servlet.generalError(resp);
         }
     }
 }

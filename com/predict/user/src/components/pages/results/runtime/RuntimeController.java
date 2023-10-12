@@ -1,6 +1,9 @@
 package components.pages.results.runtime;
 
 import engine.SimulationDto;
+import errors.ErrorDialog;
+import generic.MessageObject;
+import http.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -16,9 +19,16 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
+import utils.Constants;
 import utils.SimpleItem;
+import utils.Url;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,27 +133,69 @@ public class RuntimeController implements Initializable {
     }
 
     @FXML
-    void rerunSimulation(ActionEvent event) {
-
-    }
-
-    @FXML
     void pauseCurrentTask(ActionEvent event) {
+      String fixedUrl = Url.addFirstQueryParam(Constants.SIMULATION_PAUSE_URL, "id", simulationDto.getId().toString());
+        HttpClientUtil.runAsyncGet(fixedUrl, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                ErrorDialog.send(e.getMessage());
+            }
 
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.code() != HttpURLConnection.HTTP_OK) {
+                    MessageObject messageObject = (MessageObject)HttpClientUtil.fromJsonToObject(response.body(), new MessageObject(""));
+                    Platform.runLater(() -> ErrorDialog.send(messageObject.getMessage()));
+                } else {
+                    System.out.println("Simulation paused");
+                }
+                response.body().close();
+            }
+        });
     }
 
     @FXML
     void playCurrentTask(ActionEvent event) {
+        String fixedUrl = Url.addFirstQueryParam(Constants.SIMULATION_PLAY_URL, "id", simulationDto.getId().toString());
+        HttpClientUtil.runAsyncGet(fixedUrl, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                ErrorDialog.send(e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.code() != HttpURLConnection.HTTP_OK) {
+                    MessageObject messageObject = (MessageObject)HttpClientUtil.fromJsonToObject(response.body(), new MessageObject(""));
+                    Platform.runLater(() -> ErrorDialog.send(messageObject.getMessage()));
+                } else {
+                    System.out.println("Simulation play");
+                }
+                response.body().close();
+            }
+        });
     }
 
     @FXML
     void stopCurrentTask(ActionEvent event) {
-    }
+        String fixedUrl = Url.addFirstQueryParam(Constants.SIMULATION_STOP_URL, "id", simulationDto.getId().toString());
+        HttpClientUtil.runAsyncGet(fixedUrl, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                ErrorDialog.send(e.getMessage());
+            }
 
-
-    @FXML
-    void onRunTick(ActionEvent event) {
-
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.code() != HttpURLConnection.HTTP_OK) {
+                    MessageObject messageObject = (MessageObject)HttpClientUtil.fromJsonToObject(response.body(), new MessageObject(""));
+                    Platform.runLater(() -> ErrorDialog.send(messageObject.getMessage()));
+                } else {
+                    System.out.println("Simulation stopped");
+                }
+                response.body().close();
+            }
+        });
     }
 
 }
